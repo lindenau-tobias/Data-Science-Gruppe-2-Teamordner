@@ -1,0 +1,7 @@
+
+```{r}
+library(readr)
+
+read_csv('cyn_testtext.csv')
+```
+
