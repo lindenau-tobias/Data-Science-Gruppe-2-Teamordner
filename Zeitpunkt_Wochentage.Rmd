@@ -14,6 +14,7 @@ library(readr)
 library(tidyverse)
 library(lubridate)
 library(ggplot2)
+library(dplyr)
 ```
 
 
@@ -21,17 +22,11 @@ Einlesen und Vorbereitung der Daten
 ```{r}
 #Einlesen der Daten
 
-umsatz<-umsatzdaten_gekuerzt <- read_csv("umsatzdaten_gekuerzt.csv", 
+umsatz <- read_csv("umsatzdaten_gekuerzt.csv", 
     col_types = cols(Datum = col_datetime(format = " %Y-%m-%d   "))) #Eingeben des Datums
 ```
 
-```{r}
-#Visualsierung des Umsatzes f?r die Jahre 2013-2018 HAT NICHT FUNKTIONIERT
-umsatz%>%
-   ggplot(aes(Umsatz))+
-    geom_freqpoly() #weil ein Monat etwa so viele Tage hat
-  
-```
+
 
 ```{r}
 
@@ -72,6 +67,39 @@ ggplot(my_sum_week) +
 ```{r}
 #Jahres umsatz allgemein (hier ist noch ein Fehler drin, scheint es durschnittlich f?r die Tage des einzelnen Jahres zu plotten)
 
+
+#Erstellung der Variable mit Jahr
+
+umsatz$jahr <- year(umsatz$Datum)
+
+#Balkendiagramm der Umsätze  je Jahr (ohne Konfidenzintervall)
+
+ggplot(umsatz) +
+  geom_bar(aes(x = jahr, y = Umsatz), stat = "identity")
+
+
+#Balkendiagramm der Umsätze aller Warengruppen je Jahr(ohne Konfidenzintervall)
+# Berechnung von Mittelwerten, Standardabweichungen, Standardfehlern und Konfidenzintervallen
+
+my_sum_year<- umsatz %>%
+  group_by(jahr) %>%
+  summarise(
+    n=n(), #ist praktisch, weil es die Anzahl z?hlt
+    mean=mean(Umsatz),
+    sd=sd(Umsatz)
+  ) %>%
+  mutate( se=sd/sqrt(n))  %>%
+  mutate( ic=se * qt((1-0.05)/2 + .5, n-1))
+
+# Confidence Interval
+ggplot(my_sum_year) +
+  geom_bar( aes(x=jahr, y=mean), stat="identity", fill="forestgreen", alpha=0.5) +
+  geom_errorbar( aes(x=jahr, ymin=mean-ic, ymax=mean+ic), width=0.4, colour="orange", alpha=0.9, size=1.5) +
+  ggtitle("Durchschnittlicher Umsatz des Jahres ?ber alle Warengruppen")
+```
+
+```{r}
+#Jahres umsatz summe
 
 #Erstellung der Variable mit Wochentag
 
