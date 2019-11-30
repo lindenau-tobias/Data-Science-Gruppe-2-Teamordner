@@ -65,6 +65,46 @@ ggplot(my_sum_week) +
 ```
 
 ```{r}
+# Libraries
+library(tidyverse)
+library(hrbrthemes)
+library(viridis)
+library(forcats)
+
+# Load dataset from github
+data <- read.table("https://raw.githubusercontent.com/zonination/perceptions/master/probly.csv", header=TRUE, sep=",")
+data <- data %>%
+  gather(key="text", value="value") %>%
+  mutate(text = gsub("\\.", " ",text)) %>%
+  mutate(value = round(as.numeric(value),0))
+
+# plot
+p <- data %>%
+  mutate(text = fct_reorder(text, value)) %>%
+  ggplot( aes(x=value, color=text, fill=text)) +
+    geom_histogram(alpha=0.6, binwidth = 5) +
+    scale_fill_viridis(discrete=TRUE) +
+    scale_color_viridis(discrete=TRUE) +
+    theme_ipsum() +
+    theme(
+      legend.position="none",
+      panel.spacing = unit(0.1, "lines"),
+      strip.text.x = element_text(size = 8)
+    ) +
+    xlab("") +
+    ylab("Assigned Probability (%)") +
+    facet_wrap(~text)
+```
+
+
+
+
+
+
+
+
+
+```{r}
 #Jahres umsatz allgemein (hier ist noch ein Fehler drin, scheint es durschnittlich f?r die Tage des einzelnen Jahres zu plotten)
 
 
@@ -101,32 +141,11 @@ ggplot(my_sum_year) +
 ```{r}
 #Jahres umsatz summe
 
-#Erstellung der Variable mit Wochentag
 
-umsatz$jahr <- year(umsatz$Datum)
+#Balkendiagramm der Summe Umsätze je Jahr(ohne Konfidenzintervall)
 
-#Balkendiagramm der Umsätze von Warengruppe 1 je Wochentag (ohne Konfidenzintervall)
-
-ggplot(umsatz) +
+p<-ggplot(umsatz) +
   geom_bar(aes(x = jahr, y = Umsatz), stat = "identity")
 
 
-#Balkendiagramm der Umsätze aller Warengruppen je Wochentag (ohne Konfidenzintervall)
-# Berechnung von Mittelwerten, Standardabweichungen, Standardfehlern und Konfidenzintervallen
-
-my_sum_year<- umsatz %>%
-  group_by(jahr) %>%
-  summarise(
-    n=n(), #ist praktisch, weil es die Anzahl z?hlt
-    mean=mean(Umsatz),
-    sd=sd(Umsatz)
-  ) %>%
-  mutate( se=sd/sqrt(n))  %>%
-  mutate( ic=se * qt((1-0.05)/2 + .5, n-1))
-
-# Confidence Interval
-ggplot(my_sum_year) +
-  geom_bar( aes(x=jahr, y=mean), stat="identity", fill="forestgreen", alpha=0.5) +
-  geom_errorbar( aes(x=jahr, ymin=mean-ic, ymax=mean+ic), width=0.4, colour="orange", alpha=0.9, size=1.5) +
-  ggtitle("Durchschnittlicher Umsatz des Jahres ?ber alle Warengruppen")
 ```
