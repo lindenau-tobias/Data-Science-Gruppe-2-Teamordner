@@ -1,7 +1,7 @@
 ---
 title: "Zeitpunkt_Wochentage und Monat"
 output: html_notebook
-Ziel: "Welchen Einfluss hat die Lage im Monat und in der Woche auf den Umsatz?"
+Ziel: "Welchen Einfluss hat die Lage  in der Woche auf den Umsatz?"
 Autor: "Merle Oelbüttel"
 Datum des Erstellens: "28.11.2019"
 
