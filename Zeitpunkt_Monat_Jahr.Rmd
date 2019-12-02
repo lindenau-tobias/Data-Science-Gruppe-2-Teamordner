@@ -56,7 +56,32 @@ ggplot(ware_jahr) +
 
 
 ```
+über den Gesamten Zeitraum den allgemeinen Umsatz plotten
+```{r}
 
+#Summe der Jahre bilden 
+sum_tag<- umsatz %>%
+  group_by(Datum) %>%
+  summarise(
+    n=n(), #ist praktisch, weil es die Anzahl z?hlt
+    mean=mean(Umsatz),
+    sd=sd(Umsatz),
+    summe=sum(Umsatz)) %>%
+  mutate( se=sd/sqrt(n))  %>%
+  mutate( ic=se * qt((1-0.05)/2 + .5, n-1))
+#nach Warengruppe an den Monatstagen den Umsatz plotten
+
+ggplot(sum_tag, aes(x=Datum, y=summe)) +
+  geom_point() +
+  geom_smooth(method=lm , color="red", se=FALSE) +
+    geom_label( 
+    data=sum_tag %>% filter(summe>=2000), # alles mit einer Summe ab 2000€ gelabelt
+    aes(label=Datum)
+  )+
+  xlab("Jahr")+
+  ylab("Summe Umsatz (€)")
+  ggtitle("Umsatz über den gesamten Zeitraum")
+```
 
 ```{r}
 #Balkendiagramm der Summe Umsätze je Jahr(ohne Konfidenzintervall)
