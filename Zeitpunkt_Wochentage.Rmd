@@ -38,9 +38,9 @@ umsatz <- read_csv("umsatzdaten_gekuerzt.csv",
 umsatz$wochentag <- weekdays(umsatz$Datum)
 
 #Tage ordnen
-ware_week$wochentag <- factor(ware_week$wochentag , levels= c("Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"))
+umsatz$wochentag <- factor(umsatz$wochentag , levels= c("Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"))
 
-ware_week[order(ware_week$wochentag), ]
+umsatz[order(umsatz$wochentag), ]
 #Balkendiagramm der Umsätze von Warengruppe 1 je Wochentag (ohne Konfidenzintervall)
 
 ggplot(umsatz) +
@@ -102,7 +102,7 @@ ggplot(ware_week) +
 
 
 
-
+für weitere Analyse müssen erst die ganzen Feiertage etc. rausgenommen werden
 
 
 
