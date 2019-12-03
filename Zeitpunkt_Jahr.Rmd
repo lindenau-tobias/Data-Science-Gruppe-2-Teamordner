@@ -94,8 +94,7 @@ ggplot(umsatz, aes(x=Datum, y=Umsatz)) +
   ylab("Summe Umsatz (€)")+
   ggtitle ("Umsatz über den gesamten Zeitraum nach Warengruppen")
 
-#testzeile
-    
+
 ```
 
 ```{r}
