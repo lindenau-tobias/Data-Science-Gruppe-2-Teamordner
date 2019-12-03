@@ -1,0 +1,180 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+1. Packages und Daten laden
+```{r}
+# Installation der benötigten Packages
+##install.packages("lubridate")
+#install.packages("viridis")
+#install.packages("hrbrthemes")
+#install.packages("reshape2")
+
+# Einbinden benötigter Bibliotheken
+library(readr)
+library(lubridate)
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(hrbrthemes)
+library(reshape2)
+
+# Einlesen der Umsatzdaten
+setwd("C:/Users/Tobias/Documents/Data Science Gruppe 2 Teamordner")
+umsatzdaten <- read_csv("umsatzdaten_gekuerzt.csv")
+sd_umsatz <- sd(umsatzdaten$Umsatz)
+#sd <- sqrt(var(umsatzdaten$Umsatz))
+
+# Einlesen der Wetter (Temperatur)
+setwd("C:/Users/Tobias/Documents/Data Science Gruppe 2 Teamordner")
+wetter <- read_csv("wetter.csv")
+sd_temp <- sd(wetter$Temperatur)
+```
+
+2. Tabelle Umsatz und Wetter mergen und als .csv abspeichern
+```{r}
+#Tabelle Umsatz und Wetter zusammenführen
+merge_um_wet <- merge(umsatzdaten,wetter,by="Datum")
+
+# Als .csv im workspace abspeichern
+write.csv(merge_um_wet, file = "merge_um_wet.csv")
+```
+
+3. Temperatur Klassen
+```{r}
+#Neue Spalte mit dem Namen Temperaturklassen hinzufügen
+merge_um_wet$Temperaturklassen<-NA
+
+# Klasseneinteilung in kalt (Temp<10), normla (Temp10-20) und warm (Temp>20)
+merge_um_wet$Temperaturklassen <- "kalt"
+merge_um_wet$Temperaturklassen[merge_um_wet$Temperatur > 10 & merge_um_wet$Temperatur < 20] <- "normal"
+merge_um_wet$Temperaturklassen[merge_um_wet$Temperatur > 20] <- "warm"
+
+# Als .csv im workspace abspeichern
+write.csv(merge_um_wet, file = "merge_um_wet_temp_klass.csv")
+```
+
+4. Grundlegende Untersuchungen der Abhängigkeit (Temp-Umsatz)
+```{r}
+ggplot(merge_um_wet, aes(x=Temperatur, y=Umsatz)) +
+  geom_point() +
+  geom_smooth(method=lm , color="red", fill="#69b3a2", se=TRUE) +
+  theme_ipsum()
+
+hist(merge_um_wet$Temperatur,  main="" , breaks=30 , col=rgb(0.3,0.5,1,0.4) , xlab="Temperatur" , ylab="Anzahl der Tage")
+
+hist(merge_um_wet$Umsatz,  main="" , breaks=30 , col=rgb(0.3,0.5,1,0.4) , xlab="Umsatz" , ylab="Anzahl der Tage")
+
+plot(merge_um_wet$Umsatz , merge_um_wet$Temperatur,  main="" , pch=20 , cex=0.4 , col=rgb(0.3,0.5,1,0.4)  , xlab="Umsatz" , ylab="Temperatur" )
+
+plot(merge_um_wet$Temperatur , merge_um_wet$Umsatz,  main="" , pch=20 , cex=0.4 , col=rgb(0.3,0.5,1,0.4)  , xlab="Temperatur" , ylab="Umsatz" )
+```
+
+
+5. Balkendiagramm (Temperatur-Umsatz)
+```{r}
+# Balkendiagramm erstellen
+ggplot(merge_um_wet, aes(x=Temperatur, y=Umsatz)) +
+  geom_bar(stat = "identity")
+
+```
+
+
+6. Balkendiagramm (Temperaturklassen-Umsatz)
+```{r}
+# Balkendiagramm erstellen
+ggplot(merge_um_wet, aes(x=Temperaturklassen, y=Umsatz)) +
+  geom_bar(stat = "identity")
+```
+
+5. Balkendiagramm (Temperatur-Umsatz)
+```{r}
+# Balkendiagramm erstellen
+ggplot(merge_um_wet, aes(x=Temperatur, y=Umsatz)) +
+  geom_bar(stat = "identity")
+
+# Berechnung von Mittelwerten, Standardabweichungen, Standardfehlern und Konfidenzintervallen
+my_sum <- merge_um_wet %>%
+  group_by(Temperatur) %>%
+  summarise(
+    n=n(),
+    mean=mean(Umsatz),
+    sd=sd(Umsatz)
+  ) %>%
+  mutate( se=sd/sqrt(n))  %>%
+  mutate( ic=se * qt((1-0.05)/2 + .5, n-1))
+
+# Confidence Interval
+ggplot(my_sum) +
+  geom_bar( aes(x=Temperatur, y=mean), stat="identity", fill="forestgreen", alpha=0.9) +
+  geom_errorbar( aes(x=Temperatur, ymin=mean-ic, ymax=mean+ic), width=0.4, colour="orange", alpha=0.9, size=0.1) +
+#  scale_x_discrete(limits = c("Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"),
+#                   labels = c("Montag", "Tuchtag", "CheapCheap", "Donnerstag", "Freitag", "Samstag", "Sonntag")) +
+  ggtitle("using confidence interval")
+
+
+```
+
+
+4. Umsatz je Warengruppe und Wetter in separate Tabellen abspeichern
+```{r}
+#Tabelle für den Umsatz nach Warengruppen
+
+test<-mutate(merge_um_wet, warm.kalt = ifelse(merg_um_wet$Teamperatur > 15, "warm", "kalt"))
+```
+
+
+
+```{r}
+# Grouped
+ggplot(merge_um_wet, aes(fill=Warengruppe, y=Umsatz, x=Temperatur)) + 
+    geom_bar(position="dodge", stat="identity") +
+    scale_fill_viridis(discrete = F, option = "E") +
+    ggtitle("Umsatze je Warengruppe zur Temperatur") +
+    facet_wrap(~Umsatz) +
+    theme_ipsum() +
+    theme(legend.position="none") +
+    xlab("")
+
+# Represent it
+p <- data %>%
+  ggplot( aes(x=Umsatz, fill=Warengruppe)) +
+    geom_histogram( color="#e9ecef", alpha=0.6, position = 'identity') +
+    scale_fill_manual(values=c("#69b3a2", "#404080")) +
+    theme_ipsum() +
+    labs(fill="")
+```
+
+EVENTUELL SPÄTER ERWEITERN:
+# Erstellung der Variable mit dem Wochentag
+umsatzdaten$Wochentage <- weekdays(umsatzdaten$Datum)
+
+```{r}
+# Balkendiagramm erstellen
+ggplot(merge_um_wet, aes(x=Temperatur, y=Umsatz)) +
+  geom_bar(stat = "identity")
+
+# Berechnung von Mittelwerten, Standardabweichungen, Standardfehlern und Konfidenzintervallen
+my_sum <- merge_um_wet %>%
+  group_by(Temperatur) %>%
+  summarise(
+    n=n(),
+    mean=mean(Umsatz),
+    sd=sd(Umsatz)
+  ) %>%
+  mutate( se=sd/sqrt(n))  %>%
+  mutate( ic=se * qt((1-0.05)/2 + .5, n-1))
+
+# Confidence Interval
+ggplot(my_sum) +
+  geom_bar( aes(x=Temperatur, y=mean), stat="identity", fill="forestgreen", alpha=0.9) +
+  geom_errorbar( aes(x=Temperatur, ymin=mean-ic, ymax=mean+ic), width=0.4, colour="orange", alpha=0.9, size=0.1) +
+#  scale_x_discrete(limits = c("Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"),
+#                   labels = c("Montag", "Tuchtag", "CheapCheap", "Donnerstag", "Freitag", "Samstag", "Sonntag")) +
+  ggtitle("using confidence interval")
+
+
+```
+# Reihenfolge in der die Wochentage angezeigt werden
+umsatzdaten$wochentage <- factor(umsatzdaten$wochentage,levels = c("Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"))

@@ -226,14 +226,223 @@ summary {
 
 
 <!-- rnb-text-begin -->
-<p>AbhÃ¤ngigkeiten zum Wetter</p>
+<ol style="list-style-type: decimal">
+<li>Packages und Daten laden</li>
+</ol>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBJbnN0YWxsYXRpb24gZGVyIGJlbsO2dGlndGVuIFBhY2thZ2VzXG4jI2luc3RhbGwucGFja2FnZXMoXCJsdWJyaWRhdGVcIilcbiNpbnN0YWxsLnBhY2thZ2VzKFwidmlyaWRpc1wiKVxuI2luc3RhbGwucGFja2FnZXMoXCJocmJydGhlbWVzXCIpXG4jaW5zdGFsbC5wYWNrYWdlcyhcInJlc2hhcGUyXCIpXG5cbiMgRWluYmluZGVuIGJlbsO2dGlndGVyIEJpYmxpb3RoZWtlblxubGlicmFyeShyZWFkcilcbmxpYnJhcnkobHVicmlkYXRlKVxubGlicmFyeShnZ3Bsb3QyKVxubGlicmFyeShkcGx5cilcbmxpYnJhcnkodmlyaWRpcylcbmxpYnJhcnkoaHJicnRoZW1lcylcbmxpYnJhcnkocmVzaGFwZTIpXG5cbiMgRWlubGVzZW4gZGVyIFVtc2F0emRhdGVuXG5zZXR3ZChcIkM6L1VzZXJzL1RvYmlhcy9Eb2N1bWVudHMvRGF0YSBTY2llbmNlIEdydXBwZSAyIFRlYW1vcmRuZXJcIilcbnVtc2F0emRhdGVuIDwtIHJlYWRfY3N2KFwidW1zYXR6ZGF0ZW5fZ2VrdWVyenQuY3N2XCIpXG5zZF91bXNhdHogPC0gc2QodW1zYXR6ZGF0ZW4kVW1zYXR6KVxuI3NkIDwtIHNxcnQodmFyKHVtc2F0emRhdGVuJFVtc2F0eikpXG5cbiMgRWlubGVzZW4gZGVyIFdldHRlciAoVGVtcGVyYXR1cilcbnNldHdkKFwiQzovVXNlcnMvVG9iaWFzL0RvY3VtZW50cy9EYXRhIFNjaWVuY2UgR3J1cHBlIDIgVGVhbW9yZG5lclwiKVxud2V0dGVyIDwtIHJlYWRfY3N2KFwid2V0dGVyLmNzdlwiKVxuc2RfdGVtcCA8LSBzZCh3ZXR0ZXIkVGVtcGVyYXR1cilcbmBgYCJ9 -->
+<pre class="r"><code># Installation der benÃ¶tigten Packages
+##install.packages(&quot;lubridate&quot;)
+#install.packages(&quot;viridis&quot;)
+#install.packages(&quot;hrbrthemes&quot;)
+#install.packages(&quot;reshape2&quot;)
+
+# Einbinden benÃ¶tigter Bibliotheken
+library(readr)
+library(lubridate)
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(hrbrthemes)
+library(reshape2)
+
+# Einlesen der Umsatzdaten
+setwd(&quot;C:/Users/Tobias/Documents/Data Science Gruppe 2 Teamordner&quot;)
+umsatzdaten &lt;- read_csv(&quot;umsatzdaten_gekuerzt.csv&quot;)
+sd_umsatz &lt;- sd(umsatzdaten$Umsatz)
+#sd &lt;- sqrt(var(umsatzdaten$Umsatz))
+
+# Einlesen der Wetter (Temperatur)
+setwd(&quot;C:/Users/Tobias/Documents/Data Science Gruppe 2 Teamordner&quot;)
+wetter &lt;- read_csv(&quot;wetter.csv&quot;)
+sd_temp &lt;- sd(wetter$Temperatur)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<ol start="2" style="list-style-type: decimal">
+<li>Tabelle Umsatz und Wetter mergen und als .csv abspeichern</li>
+</ol>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI1RhYmVsbGUgVW1zYXR6IHVuZCBXZXR0ZXIgenVzYW1tZW5mw7xocmVuXG5tZXJnZV91bV93ZXQgPC0gbWVyZ2UodW1zYXR6ZGF0ZW4sd2V0dGVyLGJ5PVwiRGF0dW1cIilcblxuIyBBbHMgLmNzdiBpbSB3b3Jrc3BhY2UgYWJzcGVpY2hlcm5cbndyaXRlLmNzdihtZXJnZV91bV93ZXQsIGZpbGUgPSBcIm1lcmdlX3VtX3dldC5jc3ZcIilcbmBgYCJ9 -->
+<pre class="r"><code>#Tabelle Umsatz und Wetter zusammenfÃ¼hren
+merge_um_wet &lt;- merge(umsatzdaten,wetter,by=&quot;Datum&quot;)
+
+# Als .csv im workspace abspeichern
+write.csv(merge_um_wet, file = &quot;merge_um_wet.csv&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<ol start="3" style="list-style-type: decimal">
+<li>Temperatur Klassen</li>
+</ol>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI05ldWUgU3BhbHRlIG1pdCBkZW0gTmFtZW4gVGVtcGVyYXR1cmtsYXNzZW4gaGluenVmw7xnZW5cbm1lcmdlX3VtX3dldCRUZW1wZXJhdHVya2xhc3NlbjwtTkFcblxuIyBLbGFzc2VuZWludGVpbHVuZyBpbiBrYWx0IChUZW1wPDEwKSwgbm9ybWxhIChUZW1wMTAtMjApIHVuZCB3YXJtIChUZW1wPjIwKVxubWVyZ2VfdW1fd2V0JFRlbXBlcmF0dXJrbGFzc2VuIDwtIFwia2FsdFwiXG5tZXJnZV91bV93ZXQkVGVtcGVyYXR1cmtsYXNzZW5bbWVyZ2VfdW1fd2V0JFRlbXBlcmF0dXIgPiAxMCAmIG1lcmdlX3VtX3dldCRUZW1wZXJhdHVyIDwgMjBdIDwtIFwibm9ybWFsXCJcbm1lcmdlX3VtX3dldCRUZW1wZXJhdHVya2xhc3NlblttZXJnZV91bV93ZXQkVGVtcGVyYXR1ciA+IDIwXSA8LSBcIndhcm1cIlxuXG4jIEFscyAuY3N2IGltIHdvcmtzcGFjZSBhYnNwZWljaGVyblxud3JpdGUuY3N2KG1lcmdlX3VtX3dldCwgZmlsZSA9IFwibWVyZ2VfdW1fd2V0X3RlbXBfa2xhc3MuY3N2XCIpXG5gYGAifQ== -->
+<pre class="r"><code>#Neue Spalte mit dem Namen Temperaturklassen hinzufÃ¼gen
+merge_um_wet$Temperaturklassen&lt;-NA
+
+# Klasseneinteilung in kalt (Temp&lt;10), normla (Temp10-20) und warm (Temp&gt;20)
+merge_um_wet$Temperaturklassen &lt;- &quot;kalt&quot;
+merge_um_wet$Temperaturklassen[merge_um_wet$Temperatur &gt; 10 &amp; merge_um_wet$Temperatur &lt; 20] &lt;- &quot;normal&quot;
+merge_um_wet$Temperaturklassen[merge_um_wet$Temperatur &gt; 20] &lt;- &quot;warm&quot;
+
+# Als .csv im workspace abspeichern
+write.csv(merge_um_wet, file = &quot;merge_um_wet_temp_klass.csv&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<ol start="4" style="list-style-type: decimal">
+<li>Grundlegende Untersuchungen der AbhÃ¤ngigkeit (Temp-Umsatz)</li>
+</ol>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZ2dwbG90KG1lcmdlX3VtX3dldCwgYWVzKHg9VGVtcGVyYXR1ciwgeT1VbXNhdHopKSArXG4gIGdlb21fcG9pbnQoKSArXG4gIGdlb21fc21vb3RoKG1ldGhvZD1sbSAsIGNvbG9yPVwicmVkXCIsIGZpbGw9XCIjNjliM2EyXCIsIHNlPVRSVUUpICtcbiAgdGhlbWVfaXBzdW0oKVxuXG5oaXN0KG1lcmdlX3VtX3dldCRUZW1wZXJhdHVyLCAgbWFpbj1cIlwiICwgYnJlYWtzPTMwICwgY29sPXJnYigwLjMsMC41LDEsMC40KSAsIHhsYWI9XCJUZW1wZXJhdHVyXCIgLCB5bGFiPVwiQW56YWhsIGRlciBUYWdlXCIpXG5cbmhpc3QobWVyZ2VfdW1fd2V0JFVtc2F0eiwgIG1haW49XCJcIiAsIGJyZWFrcz0zMCAsIGNvbD1yZ2IoMC4zLDAuNSwxLDAuNCkgLCB4bGFiPVwiVW1zYXR6XCIgLCB5bGFiPVwiQW56YWhsIGRlciBUYWdlXCIpXG5cbnBsb3QobWVyZ2VfdW1fd2V0JFVtc2F0eiAsIG1lcmdlX3VtX3dldCRUZW1wZXJhdHVyLCAgbWFpbj1cIlwiICwgcGNoPTIwICwgY2V4PTAuNCAsIGNvbD1yZ2IoMC4zLDAuNSwxLDAuNCkgICwgeGxhYj1cIlVtc2F0elwiICwgeWxhYj1cIlRlbXBlcmF0dXJcIiApXG5cbnBsb3QobWVyZ2VfdW1fd2V0JFRlbXBlcmF0dXIgLCBtZXJnZV91bV93ZXQkVW1zYXR6LCAgbWFpbj1cIlwiICwgcGNoPTIwICwgY2V4PTAuNCAsIGNvbD1yZ2IoMC4zLDAuNSwxLDAuNCkgICwgeGxhYj1cIlRlbXBlcmF0dXJcIiAsIHlsYWI9XCJVbXNhdHpcIiApXG5gYGAifQ== -->
+<pre class="r"><code>ggplot(merge_um_wet, aes(x=Temperatur, y=Umsatz)) +
+  geom_point() +
+  geom_smooth(method=lm , color=&quot;red&quot;, fill=&quot;#69b3a2&quot;, se=TRUE) +
+  theme_ipsum()
+
+hist(merge_um_wet$Temperatur,  main=&quot;&quot; , breaks=30 , col=rgb(0.3,0.5,1,0.4) , xlab=&quot;Temperatur&quot; , ylab=&quot;Anzahl der Tage&quot;)
+
+hist(merge_um_wet$Umsatz,  main=&quot;&quot; , breaks=30 , col=rgb(0.3,0.5,1,0.4) , xlab=&quot;Umsatz&quot; , ylab=&quot;Anzahl der Tage&quot;)
+
+plot(merge_um_wet$Umsatz , merge_um_wet$Temperatur,  main=&quot;&quot; , pch=20 , cex=0.4 , col=rgb(0.3,0.5,1,0.4)  , xlab=&quot;Umsatz&quot; , ylab=&quot;Temperatur&quot; )
+
+plot(merge_um_wet$Temperatur , merge_um_wet$Umsatz,  main=&quot;&quot; , pch=20 , cex=0.4 , col=rgb(0.3,0.5,1,0.4)  , xlab=&quot;Temperatur&quot; , ylab=&quot;Umsatz&quot; )</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<ol start="5" style="list-style-type: decimal">
+<li>Balkendiagramm (Temperatur-Umsatz)</li>
+</ol>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBCYWxrZW5kaWFncmFtbSBlcnN0ZWxsZW5cbmdncGxvdChtZXJnZV91bV93ZXQsIGFlcyh4PVRlbXBlcmF0dXIsIHk9VW1zYXR6KSkgK1xuICBnZW9tX2JhcihzdGF0ID0gXCJpZGVudGl0eVwiKVxuXG5gYGAifQ== -->
+<pre class="r"><code># Balkendiagramm erstellen
+ggplot(merge_um_wet, aes(x=Temperatur, y=Umsatz)) +
+  geom_bar(stat = &quot;identity&quot;)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<ol start="6" style="list-style-type: decimal">
+<li>Balkendiagramm (Temperaturklassen-Umsatz)</li>
+</ol>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBCYWxrZW5kaWFncmFtbSBlcnN0ZWxsZW5cbmdncGxvdChtZXJnZV91bV93ZXQsIGFlcyh4PVRlbXBlcmF0dXJrbGFzc2VuLCB5PVVtc2F0eikpICtcbiAgZ2VvbV9iYXIoc3RhdCA9IFwiaWRlbnRpdHlcIilcbmBgYCJ9 -->
+<pre class="r"><code># Balkendiagramm erstellen
+ggplot(merge_um_wet, aes(x=Temperaturklassen, y=Umsatz)) +
+  geom_bar(stat = &quot;identity&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<ol start="5" style="list-style-type: decimal">
+<li>Balkendiagramm (Temperatur-Umsatz)</li>
+</ol>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBCYWxrZW5kaWFncmFtbSBlcnN0ZWxsZW5cbmdncGxvdChtZXJnZV91bV93ZXQsIGFlcyh4PVRlbXBlcmF0dXIsIHk9VW1zYXR6KSkgK1xuICBnZW9tX2JhcihzdGF0ID0gXCJpZGVudGl0eVwiKVxuXG4jIEJlcmVjaG51bmcgdm9uIE1pdHRlbHdlcnRlbiwgU3RhbmRhcmRhYndlaWNodW5nZW4sIFN0YW5kYXJkZmVobGVybiB1bmQgS29uZmlkZW56aW50ZXJ2YWxsZW5cbm15X3N1bSA8LSBtZXJnZV91bV93ZXQgJT4lXG4gIGdyb3VwX2J5KFRlbXBlcmF0dXIpICU+JVxuICBzdW1tYXJpc2UoXG4gICAgbj1uKCksXG4gICAgbWVhbj1tZWFuKFVtc2F0eiksXG4gICAgc2Q9c2QoVW1zYXR6KVxuICApICU+JVxuICBtdXRhdGUoIHNlPXNkL3NxcnQobikpICAlPiVcbiAgbXV0YXRlKCBpYz1zZSAqIHF0KCgxLTAuMDUpLzIgKyAuNSwgbi0xKSlcblxuIyBDb25maWRlbmNlIEludGVydmFsXG5nZ3Bsb3QobXlfc3VtKSArXG4gIGdlb21fYmFyKCBhZXMoeD1UZW1wZXJhdHVyLCB5PW1lYW4pLCBzdGF0PVwiaWRlbnRpdHlcIiwgZmlsbD1cImZvcmVzdGdyZWVuXCIsIGFscGhhPTAuOSkgK1xuICBnZW9tX2Vycm9yYmFyKCBhZXMoeD1UZW1wZXJhdHVyLCB5bWluPW1lYW4taWMsIHltYXg9bWVhbitpYyksIHdpZHRoPTAuNCwgY29sb3VyPVwib3JhbmdlXCIsIGFscGhhPTAuOSwgc2l6ZT0wLjEpICtcbiMgIHNjYWxlX3hfZGlzY3JldGUobGltaXRzID0gYyhcIk1vbnRhZ1wiLCBcIkRpZW5zdGFnXCIsIFwiTWl0dHdvY2hcIiwgXCJEb25uZXJzdGFnXCIsIFwiRnJlaXRhZ1wiLCBcIlNhbXN0YWdcIiwgXCJTb25udGFnXCIpLFxuIyAgICAgICAgICAgICAgICAgICBsYWJlbHMgPSBjKFwiTW9udGFnXCIsIFwiVHVjaHRhZ1wiLCBcIkNoZWFwQ2hlYXBcIiwgXCJEb25uZXJzdGFnXCIsIFwiRnJlaXRhZ1wiLCBcIlNhbXN0YWdcIiwgXCJTb25udGFnXCIpKSArXG4gIGdndGl0bGUoXCJ1c2luZyBjb25maWRlbmNlIGludGVydmFsXCIpXG5cblxuYGBgIn0= -->
+<pre class="r"><code># Balkendiagramm erstellen
+ggplot(merge_um_wet, aes(x=Temperatur, y=Umsatz)) +
+  geom_bar(stat = &quot;identity&quot;)
+
+# Berechnung von Mittelwerten, Standardabweichungen, Standardfehlern und Konfidenzintervallen
+my_sum &lt;- merge_um_wet %&gt;%
+  group_by(Temperatur) %&gt;%
+  summarise(
+    n=n(),
+    mean=mean(Umsatz),
+    sd=sd(Umsatz)
+  ) %&gt;%
+  mutate( se=sd/sqrt(n))  %&gt;%
+  mutate( ic=se * qt((1-0.05)/2 + .5, n-1))
+
+# Confidence Interval
+ggplot(my_sum) +
+  geom_bar( aes(x=Temperatur, y=mean), stat=&quot;identity&quot;, fill=&quot;forestgreen&quot;, alpha=0.9) +
+  geom_errorbar( aes(x=Temperatur, ymin=mean-ic, ymax=mean+ic), width=0.4, colour=&quot;orange&quot;, alpha=0.9, size=0.1) +
+#  scale_x_discrete(limits = c(&quot;Montag&quot;, &quot;Dienstag&quot;, &quot;Mittwoch&quot;, &quot;Donnerstag&quot;, &quot;Freitag&quot;, &quot;Samstag&quot;, &quot;Sonntag&quot;),
+#                   labels = c(&quot;Montag&quot;, &quot;Tuchtag&quot;, &quot;CheapCheap&quot;, &quot;Donnerstag&quot;, &quot;Freitag&quot;, &quot;Samstag&quot;, &quot;Sonntag&quot;)) +
+  ggtitle(&quot;using confidence interval&quot;)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<ol start="4" style="list-style-type: decimal">
+<li>Umsatz je Warengruppe und Wetter in separate Tabellen abspeichern</li>
+</ol>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI1RhYmVsbGUgZsO8ciBkZW4gVW1zYXR6IG5hY2ggV2FyZW5ncnVwcGVuXG5cbnRlc3Q8LW11dGF0ZShtZXJnZV91bV93ZXQsIHdhcm0ua2FsdCA9IGlmZWxzZShtZXJnX3VtX3dldCRUZWFtcGVyYXR1ciA+IDE1LCBcIndhcm1cIiwgXCJrYWx0XCIpKVxuYGBgIn0= -->
+<pre class="r"><code>#Tabelle fÃ¼r den Umsatz nach Warengruppen
+
+test&lt;-mutate(merge_um_wet, warm.kalt = ifelse(merg_um_wet$Teamperatur &gt; 15, &quot;warm&quot;, &quot;kalt&quot;))</code></pre>
+<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBHcm91cGVkXG5nZ3Bsb3QobWVyZ2VfdW1fd2V0LCBhZXMoZmlsbD1XYXJlbmdydXBwZSwgeT1VbXNhdHosIHg9VGVtcGVyYXR1cikpICsgXG4gICAgZ2VvbV9iYXIocG9zaXRpb249XCJkb2RnZVwiLCBzdGF0PVwiaWRlbnRpdHlcIikgK1xuICAgIHNjYWxlX2ZpbGxfdmlyaWRpcyhkaXNjcmV0ZSA9IEYsIG9wdGlvbiA9IFwiRVwiKSArXG4gICAgZ2d0aXRsZShcIlVtc2F0emUgamUgV2FyZW5ncnVwcGUgenVyIFRlbXBlcmF0dXJcIikgK1xuICAgIGZhY2V0X3dyYXAoflVtc2F0eikgK1xuICAgIHRoZW1lX2lwc3VtKCkgK1xuICAgIHRoZW1lKGxlZ2VuZC5wb3NpdGlvbj1cIm5vbmVcIikgK1xuICAgIHhsYWIoXCJcIilcblxuIyBSZXByZXNlbnQgaXRcbnAgPC0gZGF0YSAlPiVcbiAgZ2dwbG90KCBhZXMoeD1VbXNhdHosIGZpbGw9V2FyZW5ncnVwcGUpKSArXG4gICAgZ2VvbV9oaXN0b2dyYW0oIGNvbG9yPVwiI2U5ZWNlZlwiLCBhbHBoYT0wLjYsIHBvc2l0aW9uID0gJ2lkZW50aXR5JykgK1xuICAgIHNjYWxlX2ZpbGxfbWFudWFsKHZhbHVlcz1jKFwiIzY5YjNhMlwiLCBcIiM0MDQwODBcIikpICtcbiAgICB0aGVtZV9pcHN1bSgpICtcbiAgICBsYWJzKGZpbGw9XCJcIilcbmBgYCJ9 -->
+<pre class="r"><code># Grouped
+ggplot(merge_um_wet, aes(fill=Warengruppe, y=Umsatz, x=Temperatur)) + 
+    geom_bar(position=&quot;dodge&quot;, stat=&quot;identity&quot;) +
+    scale_fill_viridis(discrete = F, option = &quot;E&quot;) +
+    ggtitle(&quot;Umsatze je Warengruppe zur Temperatur&quot;) +
+    facet_wrap(~Umsatz) +
+    theme_ipsum() +
+    theme(legend.position=&quot;none&quot;) +
+    xlab(&quot;&quot;)
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIlIgTm90ZWJvb2siDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQpBYmjDpG5naWdrZWl0ZW4genVtIFdldHRlcg0KYGBge3J9DQoNCmBgYA0KDQo=</div>
+# Represent it
+p &lt;- data %&gt;%
+  ggplot( aes(x=Umsatz, fill=Warengruppe)) +
+    geom_histogram( color=&quot;#e9ecef&quot;, alpha=0.6, position = 'identity') +
+    scale_fill_manual(values=c(&quot;#69b3a2&quot;, &quot;#404080&quot;)) +
+    theme_ipsum() +
+    labs(fill=&quot;&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>EVENTUELL SPÃ„TER ERWEITERN: # Erstellung der Variable mit dem Wochentag umsatzdaten<span class="math inline">\(Wochentage &lt;- weekdays(umsatzdaten\)</span>Datum)</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBCYWxrZW5kaWFncmFtbSBlcnN0ZWxsZW5cbmdncGxvdChtZXJnZV91bV93ZXQsIGFlcyh4PVRlbXBlcmF0dXIsIHk9VW1zYXR6KSkgK1xuICBnZW9tX2JhcihzdGF0ID0gXCJpZGVudGl0eVwiKVxuXG4jIEJlcmVjaG51bmcgdm9uIE1pdHRlbHdlcnRlbiwgU3RhbmRhcmRhYndlaWNodW5nZW4sIFN0YW5kYXJkZmVobGVybiB1bmQgS29uZmlkZW56aW50ZXJ2YWxsZW5cbm15X3N1bSA8LSBtZXJnZV91bV93ZXQgJT4lXG4gIGdyb3VwX2J5KFRlbXBlcmF0dXIpICU+JVxuICBzdW1tYXJpc2UoXG4gICAgbj1uKCksXG4gICAgbWVhbj1tZWFuKFVtc2F0eiksXG4gICAgc2Q9c2QoVW1zYXR6KVxuICApICU+JVxuICBtdXRhdGUoIHNlPXNkL3NxcnQobikpICAlPiVcbiAgbXV0YXRlKCBpYz1zZSAqIHF0KCgxLTAuMDUpLzIgKyAuNSwgbi0xKSlcblxuIyBDb25maWRlbmNlIEludGVydmFsXG5nZ3Bsb3QobXlfc3VtKSArXG4gIGdlb21fYmFyKCBhZXMoeD1UZW1wZXJhdHVyLCB5PW1lYW4pLCBzdGF0PVwiaWRlbnRpdHlcIiwgZmlsbD1cImZvcmVzdGdyZWVuXCIsIGFscGhhPTAuOSkgK1xuICBnZW9tX2Vycm9yYmFyKCBhZXMoeD1UZW1wZXJhdHVyLCB5bWluPW1lYW4taWMsIHltYXg9bWVhbitpYyksIHdpZHRoPTAuNCwgY29sb3VyPVwib3JhbmdlXCIsIGFscGhhPTAuOSwgc2l6ZT0wLjEpICtcbiMgIHNjYWxlX3hfZGlzY3JldGUobGltaXRzID0gYyhcIk1vbnRhZ1wiLCBcIkRpZW5zdGFnXCIsIFwiTWl0dHdvY2hcIiwgXCJEb25uZXJzdGFnXCIsIFwiRnJlaXRhZ1wiLCBcIlNhbXN0YWdcIiwgXCJTb25udGFnXCIpLFxuIyAgICAgICAgICAgICAgICAgICBsYWJlbHMgPSBjKFwiTW9udGFnXCIsIFwiVHVjaHRhZ1wiLCBcIkNoZWFwQ2hlYXBcIiwgXCJEb25uZXJzdGFnXCIsIFwiRnJlaXRhZ1wiLCBcIlNhbXN0YWdcIiwgXCJTb25udGFnXCIpKSArXG4gIGdndGl0bGUoXCJ1c2luZyBjb25maWRlbmNlIGludGVydmFsXCIpXG5cblxuYGBgIn0= -->
+<pre class="r"><code># Balkendiagramm erstellen
+ggplot(merge_um_wet, aes(x=Temperatur, y=Umsatz)) +
+  geom_bar(stat = &quot;identity&quot;)
+
+# Berechnung von Mittelwerten, Standardabweichungen, Standardfehlern und Konfidenzintervallen
+my_sum &lt;- merge_um_wet %&gt;%
+  group_by(Temperatur) %&gt;%
+  summarise(
+    n=n(),
+    mean=mean(Umsatz),
+    sd=sd(Umsatz)
+  ) %&gt;%
+  mutate( se=sd/sqrt(n))  %&gt;%
+  mutate( ic=se * qt((1-0.05)/2 + .5, n-1))
+
+# Confidence Interval
+ggplot(my_sum) +
+  geom_bar( aes(x=Temperatur, y=mean), stat=&quot;identity&quot;, fill=&quot;forestgreen&quot;, alpha=0.9) +
+  geom_errorbar( aes(x=Temperatur, ymin=mean-ic, ymax=mean+ic), width=0.4, colour=&quot;orange&quot;, alpha=0.9, size=0.1) +
+#  scale_x_discrete(limits = c(&quot;Montag&quot;, &quot;Dienstag&quot;, &quot;Mittwoch&quot;, &quot;Donnerstag&quot;, &quot;Freitag&quot;, &quot;Samstag&quot;, &quot;Sonntag&quot;),
+#                   labels = c(&quot;Montag&quot;, &quot;Tuchtag&quot;, &quot;CheapCheap&quot;, &quot;Donnerstag&quot;, &quot;Freitag&quot;, &quot;Samstag&quot;, &quot;Sonntag&quot;)) +
+  ggtitle(&quot;using confidence interval&quot;)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<div id="reihenfolge-in-der-die-wochentage-angezeigt-werden" class="section level1">
+<h1>Reihenfolge in der die Wochentage angezeigt werden</h1>
+<p>umsatzdaten<span class="math inline">\(wochentage &lt;- factor(umsatzdaten\)</span>wochentage,levels = c(“Montag”, “Dienstag”, “Mittwoch”, “Donnerstag”, “Freitag”, “Samstag”, “Sonntag”))</p>
+<!-- rnb-text-end -->
+</div>
+
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIlIgTm90ZWJvb2siDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQoxLiBQYWNrYWdlcyB1bmQgRGF0ZW4gbGFkZW4NCmBgYHtyfQ0KIyBJbnN0YWxsYXRpb24gZGVyIGJlbsO2dGlndGVuIFBhY2thZ2VzDQojI2luc3RhbGwucGFja2FnZXMoImx1YnJpZGF0ZSIpDQojaW5zdGFsbC5wYWNrYWdlcygidmlyaWRpcyIpDQojaW5zdGFsbC5wYWNrYWdlcygiaHJicnRoZW1lcyIpDQojaW5zdGFsbC5wYWNrYWdlcygicmVzaGFwZTIiKQ0KDQojIEVpbmJpbmRlbiBiZW7DtnRpZ3RlciBCaWJsaW90aGVrZW4NCmxpYnJhcnkocmVhZHIpDQpsaWJyYXJ5KGx1YnJpZGF0ZSkNCmxpYnJhcnkoZ2dwbG90MikNCmxpYnJhcnkoZHBseXIpDQpsaWJyYXJ5KHZpcmlkaXMpDQpsaWJyYXJ5KGhyYnJ0aGVtZXMpDQpsaWJyYXJ5KHJlc2hhcGUyKQ0KDQojIEVpbmxlc2VuIGRlciBVbXNhdHpkYXRlbg0Kc2V0d2QoIkM6L1VzZXJzL1RvYmlhcy9Eb2N1bWVudHMvRGF0YSBTY2llbmNlIEdydXBwZSAyIFRlYW1vcmRuZXIiKQ0KdW1zYXR6ZGF0ZW4gPC0gcmVhZF9jc3YoInVtc2F0emRhdGVuX2dla3Vlcnp0LmNzdiIpDQpzZF91bXNhdHogPC0gc2QodW1zYXR6ZGF0ZW4kVW1zYXR6KQ0KI3NkIDwtIHNxcnQodmFyKHVtc2F0emRhdGVuJFVtc2F0eikpDQoNCiMgRWlubGVzZW4gZGVyIFdldHRlciAoVGVtcGVyYXR1cikNCnNldHdkKCJDOi9Vc2Vycy9Ub2JpYXMvRG9jdW1lbnRzL0RhdGEgU2NpZW5jZSBHcnVwcGUgMiBUZWFtb3JkbmVyIikNCndldHRlciA8LSByZWFkX2Nzdigid2V0dGVyLmNzdiIpDQpzZF90ZW1wIDwtIHNkKHdldHRlciRUZW1wZXJhdHVyKQ0KYGBgDQoNCjIuIFRhYmVsbGUgVW1zYXR6IHVuZCBXZXR0ZXIgbWVyZ2VuIHVuZCBhbHMgLmNzdiBhYnNwZWljaGVybg0KYGBge3J9DQojVGFiZWxsZSBVbXNhdHogdW5kIFdldHRlciB6dXNhbW1lbmbDvGhyZW4NCm1lcmdlX3VtX3dldCA8LSBtZXJnZSh1bXNhdHpkYXRlbix3ZXR0ZXIsYnk9IkRhdHVtIikNCg0KIyBBbHMgLmNzdiBpbSB3b3Jrc3BhY2UgYWJzcGVpY2hlcm4NCndyaXRlLmNzdihtZXJnZV91bV93ZXQsIGZpbGUgPSAibWVyZ2VfdW1fd2V0LmNzdiIpDQpgYGANCg0KMy4gVGVtcGVyYXR1ciBLbGFzc2VuDQpgYGB7cn0NCiNOZXVlIFNwYWx0ZSBtaXQgZGVtIE5hbWVuIFRlbXBlcmF0dXJrbGFzc2VuIGhpbnp1ZsO8Z2VuDQptZXJnZV91bV93ZXQkVGVtcGVyYXR1cmtsYXNzZW48LU5BDQoNCiMgS2xhc3NlbmVpbnRlaWx1bmcgaW4ga2FsdCAoVGVtcDwxMCksIG5vcm1sYSAoVGVtcDEwLTIwKSB1bmQgd2FybSAoVGVtcD4yMCkNCm1lcmdlX3VtX3dldCRUZW1wZXJhdHVya2xhc3NlbiA8LSAia2FsdCINCm1lcmdlX3VtX3dldCRUZW1wZXJhdHVya2xhc3NlblttZXJnZV91bV93ZXQkVGVtcGVyYXR1ciA+IDEwICYgbWVyZ2VfdW1fd2V0JFRlbXBlcmF0dXIgPCAyMF0gPC0gIm5vcm1hbCINCm1lcmdlX3VtX3dldCRUZW1wZXJhdHVya2xhc3NlblttZXJnZV91bV93ZXQkVGVtcGVyYXR1ciA+IDIwXSA8LSAid2FybSINCg0KIyBBbHMgLmNzdiBpbSB3b3Jrc3BhY2UgYWJzcGVpY2hlcm4NCndyaXRlLmNzdihtZXJnZV91bV93ZXQsIGZpbGUgPSAibWVyZ2VfdW1fd2V0X3RlbXBfa2xhc3MuY3N2IikNCmBgYA0KDQo0LiBHcnVuZGxlZ2VuZGUgVW50ZXJzdWNodW5nZW4gZGVyIEFiaMOkbmdpZ2tlaXQgKFRlbXAtVW1zYXR6KQ0KYGBge3J9DQpnZ3Bsb3QobWVyZ2VfdW1fd2V0LCBhZXMoeD1UZW1wZXJhdHVyLCB5PVVtc2F0eikpICsNCiAgZ2VvbV9wb2ludCgpICsNCiAgZ2VvbV9zbW9vdGgobWV0aG9kPWxtICwgY29sb3I9InJlZCIsIGZpbGw9IiM2OWIzYTIiLCBzZT1UUlVFKSArDQogIHRoZW1lX2lwc3VtKCkNCg0KaGlzdChtZXJnZV91bV93ZXQkVGVtcGVyYXR1ciwgIG1haW49IiIgLCBicmVha3M9MzAgLCBjb2w9cmdiKDAuMywwLjUsMSwwLjQpICwgeGxhYj0iVGVtcGVyYXR1ciIgLCB5bGFiPSJBbnphaGwgZGVyIFRhZ2UiKQ0KDQpoaXN0KG1lcmdlX3VtX3dldCRVbXNhdHosICBtYWluPSIiICwgYnJlYWtzPTMwICwgY29sPXJnYigwLjMsMC41LDEsMC40KSAsIHhsYWI9IlVtc2F0eiIgLCB5bGFiPSJBbnphaGwgZGVyIFRhZ2UiKQ0KDQpwbG90KG1lcmdlX3VtX3dldCRVbXNhdHogLCBtZXJnZV91bV93ZXQkVGVtcGVyYXR1ciwgIG1haW49IiIgLCBwY2g9MjAgLCBjZXg9MC40ICwgY29sPXJnYigwLjMsMC41LDEsMC40KSAgLCB4bGFiPSJVbXNhdHoiICwgeWxhYj0iVGVtcGVyYXR1ciIgKQ0KDQpwbG90KG1lcmdlX3VtX3dldCRUZW1wZXJhdHVyICwgbWVyZ2VfdW1fd2V0JFVtc2F0eiwgIG1haW49IiIgLCBwY2g9MjAgLCBjZXg9MC40ICwgY29sPXJnYigwLjMsMC41LDEsMC40KSAgLCB4bGFiPSJUZW1wZXJhdHVyIiAsIHlsYWI9IlVtc2F0eiIgKQ0KYGBgDQoNCg0KNS4gQmFsa2VuZGlhZ3JhbW0gKFRlbXBlcmF0dXItVW1zYXR6KQ0KYGBge3J9DQojIEJhbGtlbmRpYWdyYW1tIGVyc3RlbGxlbg0KZ2dwbG90KG1lcmdlX3VtX3dldCwgYWVzKHg9VGVtcGVyYXR1ciwgeT1VbXNhdHopKSArDQogIGdlb21fYmFyKHN0YXQgPSAiaWRlbnRpdHkiKQ0KDQpgYGANCg0KDQo2LiBCYWxrZW5kaWFncmFtbSAoVGVtcGVyYXR1cmtsYXNzZW4tVW1zYXR6KQ0KYGBge3J9DQojIEJhbGtlbmRpYWdyYW1tIGVyc3RlbGxlbg0KZ2dwbG90KG1lcmdlX3VtX3dldCwgYWVzKHg9VGVtcGVyYXR1cmtsYXNzZW4sIHk9VW1zYXR6KSkgKw0KICBnZW9tX2JhcihzdGF0ID0gImlkZW50aXR5IikNCmBgYA0KDQo1LiBCYWxrZW5kaWFncmFtbSAoVGVtcGVyYXR1ci1VbXNhdHopDQpgYGB7cn0NCiMgQmFsa2VuZGlhZ3JhbW0gZXJzdGVsbGVuDQpnZ3Bsb3QobWVyZ2VfdW1fd2V0LCBhZXMoeD1UZW1wZXJhdHVyLCB5PVVtc2F0eikpICsNCiAgZ2VvbV9iYXIoc3RhdCA9ICJpZGVudGl0eSIpDQoNCiMgQmVyZWNobnVuZyB2b24gTWl0dGVsd2VydGVuLCBTdGFuZGFyZGFid2VpY2h1bmdlbiwgU3RhbmRhcmRmZWhsZXJuIHVuZCBLb25maWRlbnppbnRlcnZhbGxlbg0KbXlfc3VtIDwtIG1lcmdlX3VtX3dldCAlPiUNCiAgZ3JvdXBfYnkoVGVtcGVyYXR1cikgJT4lDQogIHN1bW1hcmlzZSgNCiAgICBuPW4oKSwNCiAgICBtZWFuPW1lYW4oVW1zYXR6KSwNCiAgICBzZD1zZChVbXNhdHopDQogICkgJT4lDQogIG11dGF0ZSggc2U9c2Qvc3FydChuKSkgICU+JQ0KICBtdXRhdGUoIGljPXNlICogcXQoKDEtMC4wNSkvMiArIC41LCBuLTEpKQ0KDQojIENvbmZpZGVuY2UgSW50ZXJ2YWwNCmdncGxvdChteV9zdW0pICsNCiAgZ2VvbV9iYXIoIGFlcyh4PVRlbXBlcmF0dXIsIHk9bWVhbiksIHN0YXQ9ImlkZW50aXR5IiwgZmlsbD0iZm9yZXN0Z3JlZW4iLCBhbHBoYT0wLjkpICsNCiAgZ2VvbV9lcnJvcmJhciggYWVzKHg9VGVtcGVyYXR1ciwgeW1pbj1tZWFuLWljLCB5bWF4PW1lYW4raWMpLCB3aWR0aD0wLjQsIGNvbG91cj0ib3JhbmdlIiwgYWxwaGE9MC45LCBzaXplPTAuMSkgKw0KIyAgc2NhbGVfeF9kaXNjcmV0ZShsaW1pdHMgPSBjKCJNb250YWciLCAiRGllbnN0YWciLCAiTWl0dHdvY2giLCAiRG9ubmVyc3RhZyIsICJGcmVpdGFnIiwgIlNhbXN0YWciLCAiU29ubnRhZyIpLA0KIyAgICAgICAgICAgICAgICAgICBsYWJlbHMgPSBjKCJNb250YWciLCAiVHVjaHRhZyIsICJDaGVhcENoZWFwIiwgIkRvbm5lcnN0YWciLCAiRnJlaXRhZyIsICJTYW1zdGFnIiwgIlNvbm50YWciKSkgKw0KICBnZ3RpdGxlKCJ1c2luZyBjb25maWRlbmNlIGludGVydmFsIikNCg0KDQpgYGANCg0KDQo0LiBVbXNhdHogamUgV2FyZW5ncnVwcGUgdW5kIFdldHRlciBpbiBzZXBhcmF0ZSBUYWJlbGxlbiBhYnNwZWljaGVybg0KYGBge3J9DQojVGFiZWxsZSBmw7xyIGRlbiBVbXNhdHogbmFjaCBXYXJlbmdydXBwZW4NCg0KdGVzdDwtbXV0YXRlKG1lcmdlX3VtX3dldCwgd2FybS5rYWx0ID0gaWZlbHNlKG1lcmdfdW1fd2V0JFRlYW1wZXJhdHVyID4gMTUsICJ3YXJtIiwgImthbHQiKSkNCmBgYA0KDQoNCg0KYGBge3J9DQojIEdyb3VwZWQNCmdncGxvdChtZXJnZV91bV93ZXQsIGFlcyhmaWxsPVdhcmVuZ3J1cHBlLCB5PVVtc2F0eiwgeD1UZW1wZXJhdHVyKSkgKyANCiAgICBnZW9tX2Jhcihwb3NpdGlvbj0iZG9kZ2UiLCBzdGF0PSJpZGVudGl0eSIpICsNCiAgICBzY2FsZV9maWxsX3ZpcmlkaXMoZGlzY3JldGUgPSBGLCBvcHRpb24gPSAiRSIpICsNCiAgICBnZ3RpdGxlKCJVbXNhdHplIGplIFdhcmVuZ3J1cHBlIHp1ciBUZW1wZXJhdHVyIikgKw0KICAgIGZhY2V0X3dyYXAoflVtc2F0eikgKw0KICAgIHRoZW1lX2lwc3VtKCkgKw0KICAgIHRoZW1lKGxlZ2VuZC5wb3NpdGlvbj0ibm9uZSIpICsNCiAgICB4bGFiKCIiKQ0KDQojIFJlcHJlc2VudCBpdA0KcCA8LSBkYXRhICU+JQ0KICBnZ3Bsb3QoIGFlcyh4PVVtc2F0eiwgZmlsbD1XYXJlbmdydXBwZSkpICsNCiAgICBnZW9tX2hpc3RvZ3JhbSggY29sb3I9IiNlOWVjZWYiLCBhbHBoYT0wLjYsIHBvc2l0aW9uID0gJ2lkZW50aXR5JykgKw0KICAgIHNjYWxlX2ZpbGxfbWFudWFsKHZhbHVlcz1jKCIjNjliM2EyIiwgIiM0MDQwODAiKSkgKw0KICAgIHRoZW1lX2lwc3VtKCkgKw0KICAgIGxhYnMoZmlsbD0iIikNCmBgYA0KDQpFVkVOVFVFTEwgU1DDhFRFUiBFUldFSVRFUk46DQojIEVyc3RlbGx1bmcgZGVyIFZhcmlhYmxlIG1pdCBkZW0gV29jaGVudGFnDQp1bXNhdHpkYXRlbiRXb2NoZW50YWdlIDwtIHdlZWtkYXlzKHVtc2F0emRhdGVuJERhdHVtKQ0KDQpgYGB7cn0NCiMgQmFsa2VuZGlhZ3JhbW0gZXJzdGVsbGVuDQpnZ3Bsb3QobWVyZ2VfdW1fd2V0LCBhZXMoeD1UZW1wZXJhdHVyLCB5PVVtc2F0eikpICsNCiAgZ2VvbV9iYXIoc3RhdCA9ICJpZGVudGl0eSIpDQoNCiMgQmVyZWNobnVuZyB2b24gTWl0dGVsd2VydGVuLCBTdGFuZGFyZGFid2VpY2h1bmdlbiwgU3RhbmRhcmRmZWhsZXJuIHVuZCBLb25maWRlbnppbnRlcnZhbGxlbg0KbXlfc3VtIDwtIG1lcmdlX3VtX3dldCAlPiUNCiAgZ3JvdXBfYnkoVGVtcGVyYXR1cikgJT4lDQogIHN1bW1hcmlzZSgNCiAgICBuPW4oKSwNCiAgICBtZWFuPW1lYW4oVW1zYXR6KSwNCiAgICBzZD1zZChVbXNhdHopDQogICkgJT4lDQogIG11dGF0ZSggc2U9c2Qvc3FydChuKSkgICU+JQ0KICBtdXRhdGUoIGljPXNlICogcXQoKDEtMC4wNSkvMiArIC41LCBuLTEpKQ0KDQojIENvbmZpZGVuY2UgSW50ZXJ2YWwNCmdncGxvdChteV9zdW0pICsNCiAgZ2VvbV9iYXIoIGFlcyh4PVRlbXBlcmF0dXIsIHk9bWVhbiksIHN0YXQ9ImlkZW50aXR5IiwgZmlsbD0iZm9yZXN0Z3JlZW4iLCBhbHBoYT0wLjkpICsNCiAgZ2VvbV9lcnJvcmJhciggYWVzKHg9VGVtcGVyYXR1ciwgeW1pbj1tZWFuLWljLCB5bWF4PW1lYW4raWMpLCB3aWR0aD0wLjQsIGNvbG91cj0ib3JhbmdlIiwgYWxwaGE9MC45LCBzaXplPTAuMSkgKw0KIyAgc2NhbGVfeF9kaXNjcmV0ZShsaW1pdHMgPSBjKCJNb250YWciLCAiRGllbnN0YWciLCAiTWl0dHdvY2giLCAiRG9ubmVyc3RhZyIsICJGcmVpdGFnIiwgIlNhbXN0YWciLCAiU29ubnRhZyIpLA0KIyAgICAgICAgICAgICAgICAgICBsYWJlbHMgPSBjKCJNb250YWciLCAiVHVjaHRhZyIsICJDaGVhcENoZWFwIiwgIkRvbm5lcnN0YWciLCAiRnJlaXRhZyIsICJTYW1zdGFnIiwgIlNvbm50YWciKSkgKw0KICBnZ3RpdGxlKCJ1c2luZyBjb25maWRlbmNlIGludGVydmFsIikNCg0KDQpgYGANCiMgUmVpaGVuZm9sZ2UgaW4gZGVyIGRpZSBXb2NoZW50YWdlIGFuZ2V6ZWlndCB3ZXJkZW4NCnVtc2F0emRhdGVuJHdvY2hlbnRhZ2UgPC0gZmFjdG9yKHVtc2F0emRhdGVuJHdvY2hlbnRhZ2UsbGV2ZWxzID0gYygiTW9udGFnIiwgIkRpZW5zdGFnIiwgIk1pdHR3b2NoIiwgIkRvbm5lcnN0YWciLCAiRnJlaXRhZyIsICJTYW1zdGFnIiwgIlNvbm50YWciKSkNCg==</div>
 
 
 
@@ -280,7 +489,7 @@ $(document).ready(function () {
 <!-- code folding -->
 <script>
 $(document).ready(function () {
-  window.initializeSourceEmbed("Abhängigkeiten zum Wetter_TEST.Rmd");
+  window.initializeSourceEmbed("Balkendiagram Umsätze und Temperatur.Rmd");
   window.initializeCodeFolding("show" === "show");
 });
 </script>
