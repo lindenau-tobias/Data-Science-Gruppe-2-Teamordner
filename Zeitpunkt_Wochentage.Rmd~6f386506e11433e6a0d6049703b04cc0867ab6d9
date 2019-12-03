@@ -1,0 +1,132 @@
+---
+title: "Zeitpunkt_Wochentage und Monat"
+output: html_notebook
+Ziel: "Welchen Einfluss hat die Lage im Monat und in der Woche auf den Umsatz?"
+Autor: "Merle Oelbüttel"
+Datum des Erstellens: "28.11.2019"
+
+---
+
+```{r}
+#Laden der Bibliotheken
+
+library(readr)
+library(tidyverse)
+library(lubridate)
+library(ggplot2)
+library(dplyr)
+```
+
+
+Einlesen und Vorbereitung der Daten
+```{r}
+#Einlesen der Daten
+
+umsatz <- read_csv("umsatzdaten_gekuerzt.csv", 
+    col_types = cols(Datum = col_datetime(format = " %Y-%m-%d   "))) #Eingeben des Datums
+```
+
+
+
+```{r}
+
+#Wochentage allgemein
+
+
+#Erstellung der Variable mit Wochentag
+
+umsatz$wochentag <- weekdays(umsatz$Datum)
+
+#Balkendiagramm der Umsätze von Warengruppe 1 je Wochentag (ohne Konfidenzintervall)
+
+ggplot(umsatz) +
+  geom_bar(aes(x = wochentag, y = Umsatz), stat = "identity")
+
+
+#Balkendiagramm der Umsätze aller Warengruppen je Wochentag (ohne Konfidenzintervall)
+# Berechnung von Mittelwerten, Standardabweichungen, Standardfehlern und Konfidenzintervallen
+#n ist einfach nur praktisch und z?hlt die Wochentage
+my_sum_week<- umsatz %>%
+  group_by(wochentag) %>%
+  summarise(
+    n=n(), #ist praktisch, weil es die Anzahl z?hlt
+    mean=mean(Umsatz),
+    sd=sd(Umsatz)
+  ) %>%
+  mutate( se=sd/sqrt(n))  %>%
+  mutate( ic=se * qt((1-0.05)/2 + .5, n-1))
+
+# Confidence Interval
+ggplot(my_sum_week) +
+  geom_bar( aes(x=wochentag, y=mean), stat="identity", fill="forestgreen", alpha=0.5) +
+  geom_errorbar( aes(x=wochentag, ymin=mean-ic, ymax=mean+ic), width=0.4, colour="orange", alpha=0.9, size=1.5) +
+  ggtitle("Durchschnittlicher Umsatz in der Woche ?ber alle Warengruppen")
+
+```
+
+```{r}
+#Jahres umsatz allgemein (hier ist noch ein Fehler drin, scheint es durschnittlich f?r die Tage des einzelnen Jahres zu plotten)
+
+
+#Erstellung der Variable mit Jahr
+
+umsatz$jahr <- year(umsatz$Datum)
+
+#Balkendiagramm der Umsätze  je Jahr (ohne Konfidenzintervall)
+
+ggplot(umsatz) +
+  geom_bar(aes(x = jahr, y = Umsatz), stat = "identity")
+
+
+#Balkendiagramm der Umsätze aller Warengruppen je Jahr(ohne Konfidenzintervall)
+# Berechnung von Mittelwerten, Standardabweichungen, Standardfehlern und Konfidenzintervallen
+
+my_sum_year<- umsatz %>%
+  group_by(jahr) %>%
+  summarise(
+    n=n(), #ist praktisch, weil es die Anzahl z?hlt
+    mean=mean(Umsatz),
+    sd=sd(Umsatz)
+  ) %>%
+  mutate( se=sd/sqrt(n))  %>%
+  mutate( ic=se * qt((1-0.05)/2 + .5, n-1))
+
+# Confidence Interval
+ggplot(my_sum_year) +
+  geom_bar( aes(x=jahr, y=mean), stat="identity", fill="forestgreen", alpha=0.5) +
+  geom_errorbar( aes(x=jahr, ymin=mean-ic, ymax=mean+ic), width=0.4, colour="orange", alpha=0.9, size=1.5) +
+  ggtitle("Durchschnittlicher Umsatz des Jahres ?ber alle Warengruppen")
+```
+
+```{r}
+#Jahres umsatz summe
+
+#Erstellung der Variable mit Wochentag
+
+umsatz$jahr <- year(umsatz$Datum)
+
+#Balkendiagramm der Umsätze von Warengruppe 1 je Wochentag (ohne Konfidenzintervall)
+
+ggplot(umsatz) +
+  geom_bar(aes(x = jahr, y = Umsatz), stat = "identity")
+
+
+#Balkendiagramm der Umsätze aller Warengruppen je Wochentag (ohne Konfidenzintervall)
+# Berechnung von Mittelwerten, Standardabweichungen, Standardfehlern und Konfidenzintervallen
+
+my_sum_year<- umsatz %>%
+  group_by(jahr) %>%
+  summarise(
+    n=n(), #ist praktisch, weil es die Anzahl z?hlt
+    mean=mean(Umsatz),
+    sd=sd(Umsatz)
+  ) %>%
+  mutate( se=sd/sqrt(n))  %>%
+  mutate( ic=se * qt((1-0.05)/2 + .5, n-1))
+
+# Confidence Interval
+ggplot(my_sum_year) +
+  geom_bar( aes(x=jahr, y=mean), stat="identity", fill="forestgreen", alpha=0.5) +
+  geom_errorbar( aes(x=jahr, ymin=mean-ic, ymax=mean+ic), width=0.4, colour="orange", alpha=0.9, size=1.5) +
+  ggtitle("Durchschnittlicher Umsatz des Jahres ?ber alle Warengruppen")
+```
