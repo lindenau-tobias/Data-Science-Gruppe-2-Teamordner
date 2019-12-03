@@ -71,8 +71,29 @@ plot(merge_um_wet$Umsatz , merge_um_wet$Temperatur,  main="" , pch=20 , cex=0.4 
 plot(merge_um_wet$Temperatur , merge_um_wet$Umsatz,  main="" , pch=20 , cex=0.4 , col=rgb(0.3,0.5,1,0.4)  , xlab="Temperatur" , ylab="Umsatz" )
 ```
 
+6. Balkendiagramme des Umsatzes in Abhängigkeit zur Temperatur je Warengruppe
+```{r}
+# Temperatur und den Umsatz nach Warengruppen plotten
+ggplot(merge_um_wet) +
+  geom_bar( aes(x=Temperatur, y=Umsatz), stat="identity", fill="forestgreen", alpha=0.5) +
+  geom_errorbar( aes(x=Temperatur, ymin=Umsatz, ymax=Umsatz), width=0.4, colour="orange", alpha=0.9, size=1.5) +
+  ylab(" (€)")+
+ facet_wrap(~Warengruppe)+
+  ggtitle("Umsatz nach Warengruppe und Temperatur")
 
-5. Balkendiagramm (Temperatur-Umsatz)
+# Temperaturklasse und den Umsatz nach Warengruppen plotten
+ggplot(merge_um_wet) +
+  geom_bar( aes(x=Temperaturklassen, y=Umsatz), stat="identity", fill="forestgreen", alpha=0.5) +
+  geom_errorbar( aes(x=Temperaturklassen, ymin=Umsatz, ymax=Umsatz), width=0.4, colour="orange", alpha=0.9, size=1.5) +
+  ylab(" (€)")+
+ facet_wrap(~Warengruppe)+
+  ggtitle("Umsatz nach Warengruppe und Temperaturklasse")
+
+```
+
+
+
+7. Balkendiagramm (Temperatur-Umsatz)
 ```{r}
 # Balkendiagramm erstellen
 ggplot(merge_um_wet, aes(x=Temperatur, y=Umsatz)) +
@@ -81,14 +102,14 @@ ggplot(merge_um_wet, aes(x=Temperatur, y=Umsatz)) +
 ```
 
 
-6. Balkendiagramm (Temperaturklassen-Umsatz)
+8. Balkendiagramm (Temperaturklassen-Umsatz)
 ```{r}
 # Balkendiagramm erstellen
 ggplot(merge_um_wet, aes(x=Temperaturklassen, y=Umsatz)) +
   geom_bar(stat = "identity")
 ```
 
-5. Balkendiagramm (Temperatur-Umsatz)
+9. Balkendiagramm (Temperatur-Umsatz)
 ```{r}
 # Berechnung von Mittelwerten, Standardabweichungen, Standardfehlern und Konfidenzintervallen
 my_sum <- merge_um_wet %>%
