@@ -21,6 +21,32 @@ umsatz <- read_csv("umsatzdaten_gekuerzt.csv",
 
 ##Für Warengruppe 1
 w1<-filter(umsatz, Warengruppe==1) #filtern Warengruppe 1
+
+
+
 #scatter plot
 
-scatter.smooth(x=w1$Datum, y=w1$Umsatz, main="Warengruppe 1: Umsatz ~ Datum")  # scatterplot
+ggplot(w1, aes(x=Datum, y=Umsatz)) +
+  geom_point() +
+  geom_smooth(method=lm , color="red", se=FALSE) +
+  geom_label( 
+   data=w1 %>% filter(Umsatz>=200), # alles mit einer Summe ab 2000€ gelabelt
+    aes(label=Datum)
+  )+
+  xlab("Jahr")+
+  ylab("Summe Umsatz (€)")
+ggtitle("Umsatz über den gesamten Zeitraum von w1")# scatterplot
+
+
+#Tabelle nach Umsatz sortieren
+w1<- arrange(w1, desc(Umsatz))
+
+#überprüfen, ob die Werte durch Feiertage/ Ferien beeinflusst sind
+
+besonderes<-read_delim("Variablen.csv", 
+                                   ";", escape_double = FALSE, col_types = cols(Datum = col_date(format = "%d.%m.%Y")), 
+                                   trim_ws = TRUE)
+
+Feiertage<-filter(besonderes, Feiertage==1)
+
+#heraus
