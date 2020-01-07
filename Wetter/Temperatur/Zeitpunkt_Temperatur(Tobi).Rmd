@@ -264,3 +264,17 @@ ggplot(ware_monat, aes(x=monat, y=mean)) +
   ggtitle("Umsatz nach Warengruppe und Monat")
 ```
 
+```{r}
+#Erstellung der Variable mit Wochentag
+
+merge_um_wet_zeit$wochentag <- weekdays(merge_um_wet_zeit$Datum)
+```
+
+
+```{r}
+mod <- lm(Umsatz ~ as.factor(wochentag) + Temperatur, merge_um_wet_zeit)
+summary(mod)
+```
+
+
+
