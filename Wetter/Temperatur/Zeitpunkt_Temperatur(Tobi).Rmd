@@ -272,7 +272,7 @@ merge_um_wet_zeit$wochentag <- weekdays(merge_um_wet_zeit$Datum)
 
 
 ```{r}
-mod <- lm(Umsatz ~ as.factor(wochentag) + Temperatur, merge_um_wet_zeit)
+mod <- lm(Umsatz ~ as.factor(wochentag) + as.factor(Warengruppe) + as.factor(Wettercode) + Temperatur + monat + monatstag, merge_um_wet_zeit)
 summary(mod)
 ```
 
