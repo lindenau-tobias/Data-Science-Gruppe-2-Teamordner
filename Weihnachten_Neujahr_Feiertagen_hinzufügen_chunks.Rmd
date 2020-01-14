@@ -149,13 +149,13 @@ write.csv(weihnachtsfeiertage_all, file = "weihnachtsfeiertage_all.csv")
 ```
 
 
-Weihnachtsfeiertage an den df besonderes anhängen
+Weihnachtsfeiertage und neujahr an den df besonderes anhängen
 ```{r}
-#1., 2. und 3. Weihnachtsfeiertag dem df besonderes hinzufügen
-besonderes_weihnachtsfeiertage <- bind_rows(besonderes, weihnachtsfeiertag_25,weihnachtsfeiertag_26, weihnachtsfeiertag_27)
+#1., 2. und 3. Weihnachtsfeiertag und neujahr dem df besonderes hinzufügen
+besonderes_weihnachtsfeiertage_neujahr <- bind_rows(besonderes, weihnachtsfeiertag_25,weihnachtsfeiertag_26, weihnachtsfeiertag_27,neujahrstage)
 
-#Variable besonderes inlusive Weihnachtsfeiertage als csv im workspace abspeichern
-write.csv(besonderes_weihnachtsfeiertage, file = "besonderes_weihnachtsfeiertage.csv")
+#Variable besonderes inlusive Weihnachtsfeiertage und neujahrstage als csv im workspace abspeichern
+write.csv(besonderes_weihnachtsfeiertage_neujahr, file = "besonderes_weihnachtsfeiertage_neujahr.csv")
 ```
 
 

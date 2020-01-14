@@ -162,4 +162,4 @@ write.csv(nach_Feiertag, file = "nach_feiertag.csv")
 #Versuchen, alle Tage wegzufiltern, die ein Feiertag vor einem Feiertag sind
 
 # Als .csv im workspace abspeichern
-write.csv(Feiertage, file = "merge_um_wet_zeit.csv")
+#write.csv(Feiertage, file = "merge_um_wet_zeit.csv")
