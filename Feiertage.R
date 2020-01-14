@@ -30,7 +30,7 @@ Feiertage<-filter(besonderes, Feiertage==1)
 
 #Variable für Weihnachten und Neujahr
 ## Neujahr
-Neujahr<-seq(as.Date("2013/1/1"), as.Date("2019/1/1"), "years")
+Neujahr<-as.data.frame(seq(as.Date("2013/1/1"), as.Date("2019/1/1"), "years"))
 
 
 #Weihnachten als Feiertag einfügen 
@@ -42,7 +42,7 @@ Weihnachten_27<-as.data.frame(as.Date("2013-12-27") %m+% years(c(0:7)))
 Weihnachten<-bind_rows(Weihnachten_25,Weihnachten_26, Weihnachten_27)
 
 #Weihnachten der Feiertagetabelle hinzufügen
-Feiertage<-bind_rows(Feiertage, Weihnachten)
+Feiertage<-bind_rows(Feiertage, Weihnachten, Neujahr)
 
 #erstellen einer Variablen mit allen Tagen, die einen Tag vor dem Feiertag sind
 vor_Feiertag<-Feiertage$Datum-days(1) 
