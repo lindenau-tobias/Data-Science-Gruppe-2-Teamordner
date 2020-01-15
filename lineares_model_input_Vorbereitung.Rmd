@@ -61,6 +61,9 @@ temp_klass$Datum <- as.Date(temp_klass$Datum, format = "%Y-%m-%d")
 Variablen zusammenführen
 ```{r}
 #Feiertage+kiwo
+
+master_df_vorlaeufig<-merge(besonderes_weihnachtsfeiertage_neujahr, kiwo, by = "row.names", all = TRUE)
+
 #master_df_vorlaeufig<-left_join(besonderes_weihnachtsfeiertage_neujahr, kiwo, by = "Datum") 
 # funktioniert, merged die Zeilen allerdings nicht an einem Tag sondern fügt den selben Tag noch einmal zusätzlich hinzu
 
@@ -84,8 +87,10 @@ Variablen zusammenführen
 
 
 #Feiertage+kiwo+temp_klass (inklusive wetter)
-master_df<-left_join(master_df_vorlaeufig, temp_klass, by = "Datum")
+#master_df<-left_join(master_df_vorlaeufig, temp_klass, by = "Datum")
+#fügt ungewollte multible Tage hinzu
 
+master_df<-merge(master_df_vorlaeufig, temp_klass, by = "row.names", all = TRUE)
 
 ```
 
