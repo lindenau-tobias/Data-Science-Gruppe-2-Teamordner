@@ -69,9 +69,12 @@ Variablen zusammenführen
 #reduziert den datensatz auf die tage der kiwo
 
 
-master_df_vorlaeufig<-merge(besonderes_weihnachtsfeiertage_neujahr, kiwo, by = "Datum", all = TRUE) 
+#master_df_vorlaeufig<-merge(besonderes_weihnachtsfeiertage_neujahr, kiwo, by = "Datum", all = TRUE) 
+#funktioniert auch nicht
 
 
+
+#weitere versuche
 #master_df<-merge(besonderes_weihnachtsfeiertage_neujahr,kiwo,by="Datum", incomparables = NA)
 
 #master_df<- merge(besonderes_weihnachtsfeiertage_neujahr,kiwo, by.x = besonderes_weihnachtsfeiertage_neujahr$Datum, by.y = kiwo$Datum, all=TRUE)
