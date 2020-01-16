@@ -117,3 +117,8 @@ feiertage_master$neujahrstage<-NULL
 
 ```
 
+Als csv exportieren
+```{r}
+write.csv(feiertage_master, file = "feiertage_master.csv")
+```
+
