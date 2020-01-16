@@ -1,0 +1,119 @@
+---
+title: "Feiertage, vor und nach"
+output: html_notebook
+---
+```{r}
+#Bibliotheken
+library(readr)
+library(tidyverse)
+library(lubridate)
+library(ggplot2)
+library(dplyr)
+
+
+
+```
+
+
+#Einlsen der Daten
+```{r}
+#Weihnachtsfeiertage
+
+weihnachtsfeiertag_25 <- read.csv("weihnachtsfeiertag_25.csv")
+weihnachtsfeiertag_25$Datum <- as.Date(weihnachtsfeiertag_25$Datum, format = "%Y-%m-%d")
+
+weihnachtsfeiertag_26 <- read.csv("weihnachtsfeiertag_26.csv")
+weihnachtsfeiertag_26$Datum <- as.Date(weihnachtsfeiertag_26$Datum, format = "%Y-%m-%d")
+
+weihnachtsfeiertag_27 <- read.csv("weihnachtsfeiertag_27.csv")
+weihnachtsfeiertag_27$Datum <- as.Date(weihnachtsfeiertag_27$Datum, format = "%Y-%m-%d")
+
+#Neujahr
+neujahrstage <- read.csv("neujahrstage.csv")
+neujahrstage$Datum <- as.Date(neujahrstage$Datum, format = "%Y-%m-%d")
+
+#besonderes
+besonderes<-read_delim("besondere_Tage.csv", 
+                                   ";", escape_double = FALSE, col_types = cols(Datum = col_date(format = "%d.%m.%Y")), 
+                                   trim_ws = TRUE)
+```
+
+Spaltennamen der df aendern, damit diese mit bin_rows verbunden werden koennen
+```{r}
+#25.
+#spalte umbennen
+weihnachtsfeiertag_25 %>% 
+  rename(
+    feiertag = weihnachtsfeiertag_25
+    )
+
+#X spalte loeschen
+weihnachtsfeiertag_25$X<-NULL
+
+
+#26.
+#spalte umbennen
+weihnachtsfeiertag_26 %>% 
+  rename(
+    feiertag = weihnachtsfeiertag_26
+    )
+
+#X spalte loeschen
+weihnachtsfeiertag_26$X<-NULL
+
+
+#26.
+#spalte umbennen
+weihnachtsfeiertag_27 %>% 
+  rename(
+    feiertag = weihnachtsfeiertag_27
+    )
+
+#X spalte loeschen
+weihnachtsfeiertag_27$X<-NULL
+
+
+#neujahrstage
+#spalte umbennen
+neujahrstage %>% 
+  rename(
+    feiertag = neujahrstage
+    )
+
+#X spalte loeschen
+neujahrstage$X<-NULL
+```
+
+
+#schon im df "besonderes" vorhandene Feiertage extrahieren in ein neuen df Feiertage
+```{r}
+#Feiertage aus besonderes herausfiltern
+feiertage_vl<-filter(besonderes, Feiertage==1)
+
+#neuen df für feiertage erzeugen
+feiertage_vl2<-data.frame(feiertage_vl$Datum)
+feiertage_vl2$feiertag<-feiertage_vl$Feiertage
+
+#Datumsspalte umbennen
+names(feiertage_vl2)[names(feiertage_vl2) == "feiertage_vl.Datum"] <- "Datum"
+
+```
+
+
+Variable für Feiertage zusammenstellen
+```{r}
+#df verbinden
+feiertage_master<- bind_rows(feiertage_vl2,weihnachtsfeiertag_25, weihnachtsfeiertag_26,weihnachtsfeiertag_27, neujahrstage)
+
+#neue feiertage variable hinzufügen
+feiertage_master$feiertage=1
+
+#ueberfluessige Spalten loeschen
+feiertage_master$feiertag<-NULL
+feiertage_master$weihnachtsfeiertag_25<-NULL
+feiertage_master$weihnachtsfeiertag_26<-NULL
+feiertage_master$weihnachtsfeiertag_27<-NULL
+feiertage_master$neujahrstage<-NULL
+
+```
+
