@@ -5,7 +5,7 @@ output: html_notebook
 
 ##############################################################################################################
 #title: "lineares model input "Vorbereitung"
-#Ziel: Alle Outputs zusammentragen und eine neu csv erzeugen, welche als Input für unser lineares model verwendet werden kann
+#Ziel: Feiertage Outputs zusammentragen und eine neu csv erzeugen, welche als Input für unser lineares model verwendet werden kann
 #Autor: "Tobias Lindenau"
 #Datum des Erstellens: 14.01.2020
 ################################################################################################################
