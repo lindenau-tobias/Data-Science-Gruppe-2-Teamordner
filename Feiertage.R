@@ -47,8 +47,14 @@ Feiertage<-bind_rows(Feiertage, Weihnachten, Neujahr)
 
 #Vor einem Feriertag
 
+
+
 #erstellen einer Variablen mit allen Tagen, die einen Tag vor dem Feiertag sind
 vor_Feiertag<-Feiertage$Datum-days(1) 
+
+
+
+#als dataframe speichern
 vor_Feiertag<-as.data.frame(vor_Feiertag)
 
 #alle Daten vor einem Feiertag
@@ -57,6 +63,12 @@ vor_Feiertag<-umsatz%>% filter(Datum %in% vor_Feiertag$vor_Feiertag)
 #nach Feiertag data frame mit einer spalte erweitern und den wert 1 einfügen
 
 vor_Feiertag$vor_feiertag=1
+
+#wenn in der Spalte vor dem Feiertag schon eine 1 steht herausnehmen (zwei Feiertage hintereinander)
+
+
+#lag(vor_Feiertag, n = 1L, default = NA, order_by = NULL, ...)
+
 
 #ueberfluessige Spalten loeschen
 vor_Feiertag$Umsatz<-NULL
@@ -75,6 +87,10 @@ nach_Feiertag<-as.data.frame(nach_Feiertag)
 
 #alle Daten nach einem Feiertag
 nach_Feiertag<-umsatz%>% filter(Datum %in% nach_Feiertag$nach_Feiertag)
+
+
+#Tage mit einem Feiertag davor (Ostermontag und Weihnachten)
+
 
 #nach Feiertag data frame mit einer spalte erweitern und den wert 1 einfügen
 
