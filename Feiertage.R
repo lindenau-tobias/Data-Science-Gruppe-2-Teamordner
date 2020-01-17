@@ -44,6 +44,9 @@ Weihnachten<-bind_rows(Weihnachten_25,Weihnachten_26, Weihnachten_27)
 #Weihnachten der Feiertagetabelle hinzufügen
 Feiertage<-bind_rows(Feiertage, Weihnachten, Neujahr)
 
+
+#Vor einem Feriertag
+
 #erstellen einer Variablen mit allen Tagen, die einen Tag vor dem Feiertag sind
 vor_Feiertag<-Feiertage$Datum-days(1) 
 vor_Feiertag<-as.data.frame(vor_Feiertag)
@@ -51,7 +54,20 @@ vor_Feiertag<-as.data.frame(vor_Feiertag)
 #alle Daten vor einem Feiertag
 vor_Feiertag<-umsatz%>% filter(Datum %in% vor_Feiertag$vor_Feiertag)
 
+#nach Feiertag data frame mit einer spalte erweitern und den wert 1 einfügen
 
+vor_Feiertag$vor_feiertag=1
+
+#ueberfluessige Spalten loeschen
+vor_Feiertag$Umsatz<-NULL
+vor_Feiertag$Warengruppe<-NULL
+
+#als csv im ws abspeichern
+write.csv(vor_Feiertag, file = "vor_feiertag.csv")
+
+
+
+#Nach einem Feiertag
 
 #erstellen einer Variable mit den Tagen nach einem Feiertag
 nach_Feiertag<-Feiertage$Datum+days(1)
@@ -60,6 +76,16 @@ nach_Feiertag<-as.data.frame(nach_Feiertag)
 #alle Daten nach einem Feiertag
 nach_Feiertag<-umsatz%>% filter(Datum %in% nach_Feiertag$nach_Feiertag)
 
+#nach Feiertag data frame mit einer spalte erweitern und den wert 1 einfügen
+
+nach_Feiertag$nach_feiertag=1
+
+#ueberfluessige Spalten loeschen
+nach_Feiertag$Umsatz<-NULL
+nach_Feiertag$Warengruppe<-NULL
+
+#als csv im ws abspeichern
+write.csv(nach_Feiertag, file = "nach_feiertag.csv")
 
 
 #Umsätze für die Tage vor einem Feiertag 

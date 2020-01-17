@@ -5,7 +5,7 @@ output: html_notebook
 
 ##############################################################################################################
 #title: "lineares model input "Vorbereitung"
-#Ziel: Alle Outputs zusammentragen und eine neu csv erzeugen, welche als Input für unser lineares model verwendet werden kann
+#Ziel: Feiertage Outputs zusammentragen und eine neu csv erzeugen, welche als Input für unser lineares model verwendet werden kann
 #Autor: "Tobias Lindenau"
 #Datum des Erstellens: 14.01.2020
 ################################################################################################################
@@ -48,6 +48,9 @@ neujahrstage <- Neujahr %>%
     Datum = seq.as.Date..2013.1.1....as.Date..2019.1.1.....years..
   )
 
+#Zeile 1 löschen, da der 2013-01-01 vor unserer Datenaufzeichung liegt
+neujahrstage<-neujahrstage[-c(1), ]
+
 #Variable neujahrstage als csv im workspace abspeichern
 write.csv(neujahrstage, file = "neujahrstage.csv")
 
@@ -60,7 +63,7 @@ write.csv(neujahrstage, file = "neujahrstage.csv")
 1. Weihnachtsfeiertag (Weihnachtsfeiertag_25)
 ```{r}
 # Weihnachtsfeiertag_25 (25.12.) data frame erzeugen #
-weihnachtsfeiertag_25<-as.data.frame(as.Date("2013-12-25") %m+% years(c(0:7)))
+weihnachtsfeiertag_25<-as.data.frame(as.Date("2013-12-25") %m+% years(c(0:5))) # geändert da 2019-12-25 nicht mehr auf unsere Daten zutrifft
 
 #Weihnachtsfeiertag_25 data frame mit einer spalte erweitern und den wert 1 einfügen
 weihnachtsfeiertag_25$weihnachtsfeiertag_25=1
@@ -68,7 +71,7 @@ weihnachtsfeiertag_25$weihnachtsfeiertag_25=1
 #Datumsspalte in Datum umbennen
 weihnachtsfeiertag_25 <- weihnachtsfeiertag_25 %>% 
   rename(
-    Datum = `as.Date("2013-12-25") %m+% years(c(0:7))`
+    Datum = `as.Date("2013-12-25") %m+% years(c(0:5))`
   )
 
 #Variable weihnachtsfeiertag_25 als csv im workspace abspeichern
@@ -78,7 +81,7 @@ write.csv(weihnachtsfeiertag_25, file = "weihnachtsfeiertag_25.csv")
 2. Weihnachtsfeiertag
 ```{r}
 # Weihnachtsfeiertag_26 (26.12.) data frame erzeugen #
-weihnachtsfeiertag_26<-as.data.frame(as.Date("2013-12-26") %m+% years(c(0:7)))
+weihnachtsfeiertag_26<-as.data.frame(as.Date("2013-12-26") %m+% years(c(0:5)))
 
 #Weihnachtsfeiertag_26 data frame mit einer spalte erweitern und den wert 1 einfügen
 weihnachtsfeiertag_26$weihnachtsfeiertag_26=1
@@ -86,7 +89,7 @@ weihnachtsfeiertag_26$weihnachtsfeiertag_26=1
 #Datumsspalte in Datum umbennen
 weihnachtsfeiertag_26 <- weihnachtsfeiertag_26 %>% 
   rename(
-    Datum = `as.Date("2013-12-26") %m+% years(c(0:7))`
+    Datum = `as.Date("2013-12-26") %m+% years(c(0:5))`
   )
 
 #Variable weihnachtsfeiertag_26 als csv im workspace abspeichern
@@ -96,7 +99,7 @@ write.csv(weihnachtsfeiertag_26, file = "weihnachtsfeiertag_26.csv")
 3. Weihnachtsfeiertag
 ```{r}
 # Weihnachtsfeiertag_27 (27.12.) data frame erzeugen #
-weihnachtsfeiertag_27<-as.data.frame(as.Date("2013-12-27") %m+% years(c(0:7)))
+weihnachtsfeiertag_27<-as.data.frame(as.Date("2013-12-27") %m+% years(c(0:5)))
 
 #Weihnachtsfeiertag_27 data frame mit einer spalte erweitern und den wert 1 einfügen
 weihnachtsfeiertag_27$weihnachtsfeiertag_27=1
@@ -104,7 +107,7 @@ weihnachtsfeiertag_27$weihnachtsfeiertag_27=1
 #Datumsspalte in Datum umbennen
 weihnachtsfeiertag_27 <- weihnachtsfeiertag_27 %>% 
   rename(
-    Datum = `as.Date("2013-12-27") %m+% years(c(0:7))`
+    Datum = `as.Date("2013-12-27") %m+% years(c(0:5))`
   )
 
 #Variable weihnachtsfeiertag_27 als csv im workspace abspeichern
@@ -117,9 +120,9 @@ Alle Weihnachtsfeiertage zusammen
 ```{r}
 ## Weihnachtsfeiertage_all data frame erzeugen ##
 
-Weihnachten_25<-as.data.frame(as.Date("2013-12-25") %m+% years(c(0:7)))
-Weihnachten_26<-as.data.frame(as.Date("2013-12-26") %m+% years(c(0:7)))
-Weihnachten_27<-as.data.frame(as.Date("2013-12-27") %m+% years(c(0:7)))
+Weihnachten_25<-as.data.frame(as.Date("2013-12-25") %m+% years(c(0:5)))
+Weihnachten_26<-as.data.frame(as.Date("2013-12-26") %m+% years(c(0:5)))
+Weihnachten_27<-as.data.frame(as.Date("2013-12-27") %m+% years(c(0:5)))
 
 weihnachtsfeiertage_all<-bind_rows(Weihnachten_25,Weihnachten_26, Weihnachten_27)
 
@@ -131,17 +134,17 @@ weihnachtsfeiertage_all$weihnachtsfeiertagetage_all=1
 #row id dem df_all hinzufügen. Dies erleichtert das mergen aller Weihnachtsfeiertage in eine df 
 weihnachtsfeiertage_all$ID <- seq.int(nrow(weihnachtsfeiertage_all))
 
-#----> HIER WEITERARBEITEN#Weihnachtsfeiertage mergen
+#---->  Schönheitsfehler beim Weihnachtsfeiertage mergen. Könnte allerdings trozdem genutz werden
 
-unite(weihnachtsfeiertage_all, col, Weih)
-weihnachtsfeiertage_all <- merge(Weihnachten_25,Weihnachten_26, Weihnachten_27,by="ID")
+#unite(weihnachtsfeiertage_all, col, Weih)
+#weihnachtsfeiertage_all <- merge(Weihnachten_25,Weihnachten_26, Weihnachten_27,by="ID")
 
 
 #Datumsspalte in Datum umbennen
-weihnachtsfeiertagetage_all <- weihnachtsfeiertagetage_all %>% 
-  rename(
-    Datum = seq.as.Date..2013.1.1....as.Date..2019.1.1.....years..
-  )
+#weihnachtsfeiertagetage_all <- weihnachtsfeiertagetage_all %>% 
+#  rename(
+#    Datum = seq.as.Date..2013.1.1....as.Date..2019.1.1.....years..
+#  )
 
 #Variable neujahrstage als csv im workspace abspeichern
 write.csv(weihnachtsfeiertage_all, file = "weihnachtsfeiertage_all.csv")
@@ -149,22 +152,30 @@ write.csv(weihnachtsfeiertage_all, file = "weihnachtsfeiertage_all.csv")
 ```
 
 
-Weihnachtsfeiertage an den df besonderes anhängen
+Weihnachtsfeiertage und neujahr an den df besonderes anhängen
 ```{r}
-#1., 2. und 3. Weihnachtsfeiertag dem df besonderes hinzufügen
-besonderes_weihnachtsfeiertage <- bind_rows(besonderes, weihnachtsfeiertag_25,weihnachtsfeiertag_26, weihnachtsfeiertag_27)
 
-#Variable besonderes inlusive Weihnachtsfeiertage als csv im workspace abspeichern
-write.csv(besonderes_weihnachtsfeiertage, file = "besonderes_weihnachtsfeiertage.csv")
+#1., 2. und 3. Weihnachtsfeiertag und neujahr dem df besonderes hinzufügen
+#1.Weihnachtsfeiertag an besonderes anhängen
+besonderes_weihnachtsfeiertage_neujahr_v1 <- left_join(besonderes, weihnachtsfeiertag_25, by="Datum")
+
+#2.Weihnachtsfeiertag an besonderes anhängen
+besonderes_weihnachtsfeiertage_neujahr_v2 <- left_join(besonderes_weihnachtsfeiertage_neujahr_v1, weihnachtsfeiertag_26, by="Datum")
+
+#3.Weihnachtsfeiertag an besonderes anhängen
+besonderes_weihnachtsfeiertage_neujahr_v3 <- left_join(besonderes_weihnachtsfeiertage_neujahr_v2, weihnachtsfeiertag_27, by="Datum")
+
+
+#Neujahr an besonderes anhängen
+besonderes_weihnachtsfeiertage_neujahr <- left_join(besonderes_weihnachtsfeiertage_neujahr_v3, neujahrstage, by="Datum")
+
+
+#Variable besonderes inlusive Weihnachtsfeiertage und neujahrstage als csv im workspace abspeichern
+write.csv(besonderes_weihnachtsfeiertage_neujahr, file = "besonderes_weihnachtsfeiertage_neujahr.csv")
 ```
 
-
+Variable für vor und nach einem Feiertag
 ```{r}
-
-
-
-##################################
-
 Feiertage<-filter(besonderes, Feiertage==1)
 
 
@@ -183,6 +194,10 @@ Weihnachten<-bind_rows(Weihnachten_25,Weihnachten_26, Weihnachten_27)
 
 #Weihnachten der Feiertagetabelle hinzufügen
 Feiertage<-bind_rows(Feiertage, Weihnachten)
+
+
+dat$dse1 <- as.numeric(dat$diag1 == 4230)
+besonderes_weihnachtsfeiertage_neujahr$vor_feiert<-as.factor(besonderes_weihnachtsfeiertage_neujahr$Feiertage == 1)
 
 #erstellen einer Variablen mit allen Tagen, die einen Tag vor dem Feiertag sind
 vor_Feiertag<-Feiertage$Datum-days(1) 
