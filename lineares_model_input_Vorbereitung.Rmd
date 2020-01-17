@@ -63,7 +63,24 @@ wetter$Datum <- as.Date(wetter$Datum, format = "%Y-%m-%d")
 temp_klass<-read.csv("merge_um_wet_temp_klass.csv")
 temp_klass$Datum <- as.Date(temp_klass$Datum, format = "%Y-%m-%d")
 #X Spalte loeschen
-temp_klass$X<-NULL
+temp_klass$X <-NULL
+#Warengruppe Spalte loeschen
+temp_klass$Warengruppe <-NULL
+
+#Umsatz SPalte löschen
+temp_klass$Umsatz <-NULL
+
+#Bewoelkung SPalte löschen
+temp_klass$Bewoelkung <-NULL
+
+#Temp
+temp_klass$Temperatur <-NULL
+
+#Wind
+temp_klass$Windgeschwindigkeit <-NULL
+
+#Wettercode
+temp_klass$Wettercode <-NULL
 
 #mutate(temp_klass, Datum= as.Date(Datum, format= "%Y-%m-%d")) # hat nicht funktioniert
 
@@ -95,21 +112,63 @@ master_df_vorlaeufig<-left_join(besonderes_weihnachtsfeiertage_neujahr, kiwo, by
 master_df_vorlaeufig<-left_join(master_df_vorlaeufig,wetter , by = "Datum")
 
 
-#Feiertage+kiwo+feiertage_master --> gibt 2161 zeilen Klappt
+#Feiertage+kiwo+wetter+feiertage_master --> gibt 2161 zeilen Klappt
 master_df_vorlaeufig<-left_join(master_df_vorlaeufig,feiertage_master , by = "Datum")
 #Neu generierte SPalte mit X rausloeschen
 master_df_vorlaeufig$X<-NULL
 master_df_vorlaeufig$X1<-NULL
 
 
-#Feiertage+kiwo+feiertage_master+nach_feiertag --> gibt 2232 zeilen Klappt NICHT
+
+#Feiertage+kiwo+wetter+feiertage_master+temp_klass --> gibt 10788 zeilen daher müssen in der nächsten Zeile die doppelten Zeilen entfernt werden
+master_df_vorlaeufig<-left_join(master_df_vorlaeufig,temp_klass , by = "Datum")
+#duplicate entfernen
+master_df_vorlaeufig<-distinct(master_df_vorlaeufig)
+
+
+
+#Feiertage+kiwo+wetter+feiertage_master+temp_klass+nach_feiertag --> gibt 2232 zeilen daher müssen in der nächsten Zeile die doppelten Zeilen entfernt werden
+master_df_vorlaeufig<-left_join(master_df_vorlaeufig,nach_feiertag , by = "Datum")
+#duplicate entfernen
+master_df_vorlaeufig<-distinct(master_df_vorlaeufig)
+
+
+
+#Feiertage+kiwo+wetter+feiertage_master+temp_klass+nach_feiertag+vor_feiertag --> gibt 2232 zeilen daher müssen in der nächsten Zeile die doppelten Zeilen entfernt werden
 master_df_vorlaeufig<-left_join(master_df_vorlaeufig,vor_feiertag , by = "Datum")
+#duplicate entfernen
+master_df_vorlaeufig<-distinct(master_df_vorlaeufig)
+
+```
+
+Überflüssige Spalten des df master_df_vorlaeufig entfernen
+```{r}
+master_df_vorlaeufig$nach_feiertag.y<-NULL
+master_df_vorlaeufig$Bewoelkung.y<-NULL
+master_df_vorlaeufig$Temperatur.y<-NULL
+master_df_vorlaeufig$Windgeschwindigkeit.y<-NULL
+master_df_vorlaeufig$Wettercode.y<-NULL
+
+```
+
+master_df erstellen
+```{r}
+master_df<-master_df_vorlaeufig
+```
+
+master df als csv speichern
+```{r}
+
+write.csv(master_df, file = "master_df")
+
+```
 
 
-
-#####
-#Feiertage+kiwo+vor_feiertage
-master_df_vorlaeufig1<-full_join(master_df_vorlaeufig, vor_feiertag, by = "Datum")
+Modellgleichung
+```{r}
+mod <- lm(master_df ~ Temperatur, Wochentag)
+summary(mod)
+```
 
 #master_df_vorlaeufig<-left_join(besonderes_weihnachtsfeiertage_neujahr, kiwo, by = "Datum") 
 # funktioniert, merged die Zeilen allerdings nicht an einem Tag sondern fügt den selben Tag noch einmal zusätzlich hinzu
@@ -138,20 +197,3 @@ master_df_vorlaeufig1<-full_join(master_df_vorlaeufig, vor_feiertag, by = "Datum
 #fügt ungewollte multible Tage hinzu
 
 master_df<-merge(master_df_vorlaeufig, temp_klass, by = "row.names", all = TRUE)
-
-```
-
-
-master df als csv speichern
-```{r}
-
-write.csv(master_df, file = "master_df")
-
-```
-
-
-Modellgleichung
-```{r}
-mod <- lm(master_df ~ Temperatur, Wochentag)
-summary(mod)
-```
