@@ -21,11 +21,14 @@ library(magrittr)
 
 ```
 
-Einlesen der Daten
+Einlesen der Daten GEÄNDERT!!!!
 ```{r}
 #Feiertage master df (enthält alle Feiertage inklusive Weihnachten, Neujahr. Diese hatten bisher gefehlt)
 feiertage_master <- read.csv("feiertage_master.csv")
 feiertage_master$Datum <- as.Date(feiertage_master$Datum, format = "%Y-%m-%d")
+#X Spalte loeschen
+feiertage_master$X1<-NULL
+
 
 #Feiertage, Ferien, Weihnachtsmarkt, Wochentage, Gesamtumsatz, Umsatz nach Warengruppen 1-6
 besonderes_weihnachtsfeiertage_neujahr<-read_csv("besonderes_weihnachtsfeiertage_neujahr.csv") 
@@ -34,6 +37,10 @@ besonderes_weihnachtsfeiertage_neujahr<-read_csv("besonderes_weihnachtsfeiertage
 # gelöscht, da sonst das Datum nicht mehr angezeigt wird
 mutate(besonderes_weihnachtsfeiertage_neujahr, Datum= as.Date(Datum, format= "%Y-%m-%d"))
 
+#X Spalte loeschen
+besonderes_weihnachtsfeiertage_neujahr$X<-NULL
+#Feiertage Spalte loeschen, da diese kein Neujahr und Weihnachten enthält
+besonderes_weihnachtsfeiertage_neujahr$Feiertage<-NULL
 
 
 # Umsatzdaten, 
@@ -48,24 +55,31 @@ kiwo$Datum <- as.Date(kiwo$Datum, format = "%Y-%m-%d")
 #mutate(kiwo$Datum = as.Date(Datum, format= "%Y-%m-%d")) # hat nicht funktioniert
 
 # Wetter
-wetter <- read_csv("wetter.csv",
-    col_types = cols(Datum = col_datetime(format = " %Y-%m-%d   "))) #Eingeben des Datums
+wetter <- read_csv("wetter.csv")
+wetter$Datum <- as.Date(wetter$Datum, format = "%Y-%m-%d")
+#Eingeben des Datums
 
 #Temperaturklassen
 temp_klass<-read.csv("merge_um_wet_temp_klass.csv")
 temp_klass$Datum <- as.Date(temp_klass$Datum, format = "%Y-%m-%d")
+#X Spalte loeschen
+temp_klass$X<-NULL
+
 #mutate(temp_klass, Datum= as.Date(Datum, format= "%Y-%m-%d")) # hat nicht funktioniert
 
 
 #nach Feiertag
 nach_feiertag <- read.csv("nach_feiertag.csv")
 nach_feiertag$Datum <- as.Date(nach_feiertag$Datum, format = "%Y-%m-%d")
+#X Spalte loeschen
+nach_feiertag$X<-NULL
 
 
 #vor Feiertag
 vor_feiertag <- read.csv("vor_feiertag.csv")
 vor_feiertag$Datum <- as.Date(vor_feiertag$Datum, format = "%Y-%m-%d")
-
+#X Spalte loeschen
+vor_feiertag$X<-NULL
 
 
 
@@ -73,13 +87,29 @@ vor_feiertag$Datum <- as.Date(vor_feiertag$Datum, format = "%Y-%m-%d")
 
 Variablen zusammenführen
 ```{r}
-#Feiertage+kiwo
-
+#Feiertage+kiwo --> gibt 2161 zeilen Klappt
 master_df_vorlaeufig<-left_join(besonderes_weihnachtsfeiertage_neujahr, kiwo, by = "Datum")
 
 
+#Feiertage+kiwo+wetter --> gibt 2161 zeilen Klappt
+master_df_vorlaeufig<-left_join(master_df_vorlaeufig,wetter , by = "Datum")
+
+
+#Feiertage+kiwo+feiertage_master --> gibt 2161 zeilen Klappt
+master_df_vorlaeufig<-left_join(master_df_vorlaeufig,feiertage_master , by = "Datum")
+#Neu generierte SPalte mit X rausloeschen
+master_df_vorlaeufig$X<-NULL
+master_df_vorlaeufig$X1<-NULL
+
+
+#Feiertage+kiwo+feiertage_master+nach_feiertag --> gibt 2232 zeilen Klappt NICHT
+master_df_vorlaeufig<-left_join(master_df_vorlaeufig,vor_feiertag , by = "Datum")
+
+
+
+#####
 #Feiertage+kiwo+vor_feiertage
-master_df_vorlaeufig<-left_join(master_df_vorlaeufig, vor_feiertag, by = "Datum")
+master_df_vorlaeufig1<-full_join(master_df_vorlaeufig, vor_feiertag, by = "Datum")
 
 #master_df_vorlaeufig<-left_join(besonderes_weihnachtsfeiertage_neujahr, kiwo, by = "Datum") 
 # funktioniert, merged die Zeilen allerdings nicht an einem Tag sondern fügt den selben Tag noch einmal zusätzlich hinzu
