@@ -30,7 +30,7 @@ Feiertage<-filter(besonderes, Feiertage==1)
 
 #Variable für Weihnachten und Neujahr
 ## Neujahr
-Neujahr<-seq(as.Date("2013/1/1"), as.Date("2019/1/1"), "years")
+Neujahr<-as.data.frame(seq(as.Date("2013/1/1"), as.Date("2019/1/1"), "years"))
 
 
 #Weihnachten als Feiertag einfügen 
@@ -42,7 +42,7 @@ Weihnachten_27<-as.data.frame(as.Date("2013-12-27") %m+% years(c(0:7)))
 Weihnachten<-bind_rows(Weihnachten_25,Weihnachten_26, Weihnachten_27)
 
 #Weihnachten der Feiertagetabelle hinzufügen
-Feiertage<-bind_rows(Feiertage, Weihnachten)
+Feiertage<-bind_rows(Feiertage, Weihnachten, Neujahr)
 
 
 #Vor einem Feriertag
@@ -88,6 +88,25 @@ nach_Feiertag$Warengruppe<-NULL
 write.csv(nach_Feiertag, file = "nach_feiertag.csv")
 
 
-#Versuchen, alle Tage wegzufiltern, die ein Feiertag vor einem Feiertag sind
+#Umsätze für die Tage vor einem Feiertag 
+
+#Tabelle für den Umsatz nach Warengruppen  und Jahren
+ware_jahr<- umsatz %>%
+  group_by(jahr, Warengruppe) %>%
+  summarise(
+    n=n(), #ist praktisch, weil es die Anzahl z?hlt
+    mean=mean(Umsatz),
+    sd=sd(Umsatz),
+    summe=sum(Umsatz)) %>%
+  mutate( se=sd/sqrt(n))  %>%
+  mutate( ic=se * qt((1-0.05)/2 + .5, n-1))
 
 
+
+# nach Warengruppe nach Jahren den Umsatz plotten
+ggplot(ware_jahr) +
+  geom_bar( aes(x=Warengruppe, y=mean), stat="identity", fill="forestgreen", alpha=0.5) +
+  geom_errorbar( aes(x=Warengruppe, ymin=mean-ic, ymax=mean+ic), width=0.4, colour="orange", alpha=0.9, size=1.5) +
+  ylab("Durchschnitt (€)")+
+  facet_wrap(~jahr)+
+  ggtitle("Umsatz nach Warengruppe und Jahr")
