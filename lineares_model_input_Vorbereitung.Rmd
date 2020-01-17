@@ -1,0 +1,127 @@
+---
+title: "lineares_model_input_Vorbereitung"
+output: html_notebook
+---
+
+
+#title: "lineares model input "Vorbereitung"
+#Ziel: Alle Outputs zusammentragen und eine neu csv erzeugen, welche als Input für unser lineares model verwendet werden kann
+#Autor: "Tobias Lindenau"
+#Datum des Erstellens: 14.01.2020
+
+
+```{r}
+#Bibliotheken
+library(readr)
+library(tidyverse)
+library(lubridate)
+library(ggplot2)
+library(dplyr)
+library(magrittr)
+
+```
+
+Einlesen der Daten
+```{r}
+#Feiertage master df (enthält alle Feiertage inklusive Weihnachten, Neujahr. Diese hatten bisher gefehlt)
+feiertage_master <- read.csv("feiertage_master.csv")
+feiertage_master$Datum <- as.Date(feiertage_master$Datum, format = "%Y-%m-%d")
+
+#Feiertage, Ferien, Weihnachtsmarkt, Wochentage, Gesamtumsatz, Umsatz nach Warengruppen 1-6
+besonderes_weihnachtsfeiertage_neujahr<-read_csv("besonderes_weihnachtsfeiertage_neujahr.csv") 
+#                       ",", escape_double = FALSE, col_types = cols(Datum = col_date(format = "%d.%m.%Y")), 
+#                       trim_ws = TRUE)
+# gelöscht, da sonst das Datum nicht mehr angezeigt wird
+mutate(besonderes_weihnachtsfeiertage_neujahr, Datum= as.Date(Datum, format= "%Y-%m-%d"))
+
+
+
+# Umsatzdaten, 
+#umsatz <- read_csv("umsatzdaten_gekuerzt.csv", 
+#                                 col_types = cols(Datum = col_date(format = "%Y-%m-%d"))) #Eingeben des Datums
+
+
+# Kiwo
+kiwo <- read.csv("kiwo.csv")
+kiwo$Datum <- as.Date(kiwo$Datum, format = "%Y-%m-%d")
+
+#mutate(kiwo$Datum = as.Date(Datum, format= "%Y-%m-%d")) # hat nicht funktioniert
+
+# Wetter
+wetter <- read_csv("wetter.csv",
+    col_types = cols(Datum = col_datetime(format = " %Y-%m-%d   "))) #Eingeben des Datums
+
+#Temperaturklassen
+temp_klass<-read.csv("merge_um_wet_temp_klass.csv")
+temp_klass$Datum <- as.Date(temp_klass$Datum, format = "%Y-%m-%d")
+#mutate(temp_klass, Datum= as.Date(Datum, format= "%Y-%m-%d")) # hat nicht funktioniert
+
+
+#nach Feiertag
+nach_feiertag <- read.csv("nach_feiertag.csv")
+nach_feiertag$Datum <- as.Date(nach_feiertag$Datum, format = "%Y-%m-%d")
+
+
+#vor Feiertag
+vor_feiertag <- read.csv("vor_feiertag.csv")
+vor_feiertag$Datum <- as.Date(vor_feiertag$Datum, format = "%Y-%m-%d")
+
+
+
+
+```
+
+Variablen zusammenführen
+```{r}
+#Feiertage+kiwo
+
+master_df_vorlaeufig<-left_join(besonderes_weihnachtsfeiertage_neujahr, kiwo, by = "Datum")
+
+
+#Feiertage+kiwo+vor_feiertage
+master_df_vorlaeufig<-left_join(master_df_vorlaeufig, vor_feiertag, by = "Datum")
+
+#master_df_vorlaeufig<-left_join(besonderes_weihnachtsfeiertage_neujahr, kiwo, by = "Datum") 
+# funktioniert, merged die Zeilen allerdings nicht an einem Tag sondern fügt den selben Tag noch einmal zusätzlich hinzu
+
+
+#master_df_vorlaeufig<-merge(besonderes_weihnachtsfeiertage_neujahr, kiwo, by = "Datum") 
+#reduziert den datensatz auf die tage der kiwo
+
+
+#master_df_vorlaeufig<-merge(besonderes_weihnachtsfeiertage_neujahr, kiwo, by = "Datum", all = TRUE) 
+#funktioniert auch nicht
+
+
+
+#weitere versuche
+#master_df<-merge(besonderes_weihnachtsfeiertage_neujahr,kiwo,by="Datum", incomparables = NA)
+
+#master_df<- merge(besonderes_weihnachtsfeiertage_neujahr,kiwo, by.x = besonderes_weihnachtsfeiertage_neujahr$Datum, by.y = kiwo$Datum, all=TRUE)
+
+#master_df1<-merge(master_df,wetter,by="Datum")
+
+
+
+#Feiertage+kiwo+temp_klass (inklusive wetter)
+#master_df<-left_join(master_df_vorlaeufig, temp_klass, by = "Datum")
+#fügt ungewollte multible Tage hinzu
+
+master_df<-merge(master_df_vorlaeufig, temp_klass, by = "row.names", all = TRUE)
+
+```
+
+
+master df als csv speichern
+```{r}
+
+write.csv(master_df, file = "master_df")
+
+```
+
+
+Modellgleichung
+```{r}
+mod <- lm(master_df ~ Temperatur, Wochentag)
+summary(mod)
+```

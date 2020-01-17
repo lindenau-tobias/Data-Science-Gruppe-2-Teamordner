@@ -1,5 +1,5 @@
 ---
-title: "Zeitpunkt_Wochentage und Monat"
+title: "Zeitpunkt_Wochentage"
 output: html_notebook
 Ziel: "Welchen Einfluss hat die Lage  in der Woche auf den Umsatz?"
 Autor: "Merle Oelbüttel"
@@ -148,7 +148,7 @@ ware_ohne6_5gr1000[order(ware_ohne6_5gr1000$wochentag), ]
 # nach Warengruppe an den Wochentagen den Umsatz plotten (ohne Warengruppe 6 und Warengruppe 5 über 1000 Euro)
 ggplot(ware_ohne6_5gr1000) +
   geom_bar( aes(x=wochentag, y=mean), stat="identity", fill="forestgreen", alpha=0.5) +
-  geom_errorbar( aes(x=Warengruppe, ymin=mean-ic, ymax=mean+ic), width=0.4, colour="orange", alpha=0.9, size=1.5) +
+  geom_errorbar( aes(x=wochentag, ymin=mean-ic, ymax=mean+ic), width=0.4, colour="orange", alpha=0.9, size=1.5) +
   ylab("Durchschnitt (€)")+
   facet_wrap(~Warengruppe)+
   ggtitle("Umsatz nach Warengruppe und Wochentag")+
