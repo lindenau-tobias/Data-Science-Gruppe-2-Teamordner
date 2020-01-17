@@ -64,10 +64,7 @@ vor_Feiertag<-umsatz%>% filter(Datum %in% vor_Feiertag$vor_Feiertag)
 
 vor_Feiertag$vor_feiertag=1
 
-#wenn in der Spalte vor dem Feiertag schon eine 1 steht herausnehmen (zwei Feiertage hintereinander)
 
-
-#lag(vor_Feiertag, n = 1L, default = NA, order_by = NULL, ...)
 
 
 #ueberfluessige Spalten loeschen
