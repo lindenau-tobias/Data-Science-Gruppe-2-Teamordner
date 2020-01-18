@@ -156,44 +156,31 @@ master_df erstellen
 master_df<-master_df_vorlaeufig
 ```
 
+Ja oder Nein Variablen als as.factor setzten
+```{r}
+master_df$Wochentag<-as.factor(master_df$Wochentag)
+master_df$Sonntag<-as.factor(master_df$Sonntag)
+master_df$Samstag<-as.factor(master_df$Samstag)
+master_df$Samstag<-as.factor(master_df$Samstag)
+master_df$Monat<-as.factor(master_df$Monat)
+master_df$Weihnachtsmarkt<-as.factor(master_df$Weihnachtsmarkt)
+master_df$Ferien<-as.factor(master_df$Ferien)
+master_df$weihnachtsfeiertag_25<-as.factor(master_df$weihnachtsfeiertag_25)
+master_df$weihnachtsfeiertag_26<-as.factor(master_df$weihnachtsfeiertag_26)
+master_df$weihnachtsfeiertag_27<-as.factor(master_df$weihnachtsfeiertag_27)
+master_df$neujahrstage<-as.factor(master_df$neujahrstage)
+master_df$KielerWoche<-as.factor(master_df$KielerWoche)
+master_df$Wettercode<-as.factor(master_df$Wettercode)
+master_df$feiertage<-as.factor(master_df$feiertage)
+master_df$Temperaturklassen<-as.factor(master_df$Temperaturklassen)
+master_df$nach_feiertag<-as.factor(master_df$nach_feiertag)
+master_df$vor_feiertag<-as.factor(master_df$vor_feiertag)
+
+```
+
 master df als csv speichern
 ```{r}
 
-write.csv(master_df, file = "master_df")
+write.csv(master_df, file = "master_df.csv")
 
 ```
-
-
-Modellgleichung
-```{r}
-mod <- lm(master_df ~ Temperatur, Wochentag)
-summary(mod)
-```
-
-#master_df_vorlaeufig<-left_join(besonderes_weihnachtsfeiertage_neujahr, kiwo, by = "Datum") 
-# funktioniert, merged die Zeilen allerdings nicht an einem Tag sondern fügt den selben Tag noch einmal zusätzlich hinzu
-
-
-#master_df_vorlaeufig<-merge(besonderes_weihnachtsfeiertage_neujahr, kiwo, by = "Datum") 
-#reduziert den datensatz auf die tage der kiwo
-
-
-#master_df_vorlaeufig<-merge(besonderes_weihnachtsfeiertage_neujahr, kiwo, by = "Datum", all = TRUE) 
-#funktioniert auch nicht
-
-
-
-#weitere versuche
-#master_df<-merge(besonderes_weihnachtsfeiertage_neujahr,kiwo,by="Datum", incomparables = NA)
-
-#master_df<- merge(besonderes_weihnachtsfeiertage_neujahr,kiwo, by.x = besonderes_weihnachtsfeiertage_neujahr$Datum, by.y = kiwo$Datum, all=TRUE)
-
-#master_df1<-merge(master_df,wetter,by="Datum")
-
-
-
-#Feiertage+kiwo+temp_klass (inklusive wetter)
-#master_df<-left_join(master_df_vorlaeufig, temp_klass, by = "Datum")
-#fügt ungewollte multible Tage hinzu
-
-master_df<-merge(master_df_vorlaeufig, temp_klass, by = "row.names", all = TRUE)

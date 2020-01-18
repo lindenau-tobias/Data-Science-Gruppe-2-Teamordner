@@ -1,0 +1,82 @@
+---
+title: "linearer_model_input"
+output: html_notebook
+---
+
+
+#title: "linearer model input
+#Ziel: model mit den master df variablen füttern
+#Autor: "Tobias Lindenau"
+#Datum des Erstellens: 18.01.2020
+
+
+```{r}
+#install.packages("Metrics")
+#Bibliotheken
+library(readr)
+library(tidyverse)
+library(lubridate)
+library(ggplot2)
+library(dplyr)
+library(magrittr)
+library(broom)
+library(Metrics)
+
+```
+
+Einlesen der Daten
+```{r}
+# master df einlesen
+master_df <- read.csv("master_df.csv")
+master_df$Datum <- as.Date(master_df$Datum, format = "%Y-%m-%d")
+#X Spalte loeschen
+master_df$X<-NULL
+
+```
+
+Ja oder Nein Variablen als as.factor setzten
+```{r}
+master_df$Wochentag<-as.factor(master_df$Wochentag)
+master_df$Sonntag<-as.factor(master_df$Sonntag)
+master_df$Samstag<-as.factor(master_df$Samstag)
+master_df$Samstag<-as.factor(master_df$Samstag)
+master_df$Monat<-as.factor(master_df$Monat)
+master_df$Weihnachtsmarkt<-as.factor(master_df$Weihnachtsmarkt)
+master_df$Ferien<-as.factor(master_df$Ferien)
+master_df$weihnachtsfeiertag_25<-as.factor(master_df$weihnachtsfeiertag_25)
+master_df$weihnachtsfeiertag_26<-as.factor(master_df$weihnachtsfeiertag_26)
+master_df$weihnachtsfeiertag_27<-as.factor(master_df$weihnachtsfeiertag_27)
+master_df$neujahrstage<-as.factor(master_df$neujahrstage)
+#master_df$KielerWoche<-as.factor(master_df$KielerWoche)
+master_df$Wettercode<-as.factor(master_df$Wettercode)
+master_df$feiertage<-as.factor(master_df$feiertage)
+master_df$Temperaturklassen<-as.factor(master_df$Temperaturklassen)
+master_df$nach_feiertag<-as.factor(master_df$nach_feiertag)
+master_df$vor_feiertag<-as.factor(master_df$vor_feiertag)
+
+```
+
+Kiwo as double
+```{r}
+master_df$KielerWoche<-as.double(master_df$KielerWoche)
+```
+
+Na Value mit 0 ersetzten
+```{r}
+master_df <- master_df %>%
+    mutate(KielerWoche = if_else(is.na(KielerWoche), 0, KielerWoche))
+```
+
+
+Modellgleichung
+```{r}
+mod1 <- lm(Gesamtumsatz ~ KielerWoche, master_df)
+summary(mod1)
+
+```
+
+```{r}
+mod1 <- lm(Gesamtumsatz ~ Wochentag + Sonntag + Samstag + Monat + Weihnachtsmarkt + Ferien + Monat + Ware_1 + Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + weihnachtsfeiertag_25 + weihnachtsfeiertag_26 + weihnachtsfeiertag_27 + neujahrstage + KielerWoche, master_df)
+summary(mod1)
+```
+
