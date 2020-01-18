@@ -44,14 +44,8 @@ Weihnachten<-bind_rows(Weihnachten_25,Weihnachten_26, Weihnachten_27)
 #Weihnachten der Feiertagetabelle hinzufügen
 Feiertage<-bind_rows(Feiertage, Weihnachten, Neujahr)
 
-
-#Vor einem Feriertag
-
-
-
 #erstellen einer Variablen mit allen Tagen, die einen Tag vor dem Feiertag sind
 vor_Feiertag<-Feiertage$Datum-days(1) 
-
 
 
 #als dataframe speichern
@@ -74,8 +68,6 @@ vor_Feiertag$Warengruppe<-NULL
 #als csv im ws abspeichern
 write.csv(vor_Feiertag, file = "vor_feiertag.csv")
 
-
-
 #Nach einem Feiertag
 
 #erstellen einer Variable mit den Tagen nach einem Feiertag
@@ -84,10 +76,6 @@ nach_Feiertag<-as.data.frame(nach_Feiertag)
 
 #alle Daten nach einem Feiertag
 nach_Feiertag<-umsatz%>% filter(Datum %in% nach_Feiertag$nach_Feiertag)
-
-
-#Tage mit einem Feiertag davor (Ostermontag und Weihnachten)
-
 
 #nach Feiertag data frame mit einer spalte erweitern und den wert 1 einfügen
 
@@ -101,18 +89,28 @@ nach_Feiertag$Warengruppe<-NULL
 write.csv(nach_Feiertag, file = "nach_feiertag.csv")
 
 
-#Umsätze für die Tage vor einem Feiertag 
+#große Master-Tabelle in den Datensatz importieren
 
-#Tabelle für den Umsatz nach Warengruppen  und Jahren
-ware_jahr<- umsatz %>%
-  group_by(jahr, Warengruppe) %>%
+master_df <- read_csv("master_df", col_types = cols(Datum = col_date(format = "%Y-%m-%d")))
+
+#die Wochentage danebenschreiben 
+master_df$wochentagname <- weekdays(master_df$Datum)
+
+#nur die Dienstage herausfiltern (Dienstage sind willkürlich gewählt)
+Dienstag<- filter(master_df, wochentagname=="Dienstag")
+
+
+#Tabelle für den Umsatz nach den unterschiedlichen Variablen
+umsatz_Dienstag<- Dienstag %>%
+  group_by( Ferien, vor_feiertag, nach_feiertag, KielerWoche, Temperaturklassen ) %>%
   summarise(
     n=n(), #ist praktisch, weil es die Anzahl z?hlt
-    mean=mean(Umsatz),
-    sd=sd(Umsatz),
-    summe=sum(Umsatz)) %>%
+    mean=mean(Gesamtumsatz),
+    sd=sd(Gesamtumsatz),
+    summe=sum(Gesamtumsatz)) %>%
   mutate( se=sd/sqrt(n))  %>%
   mutate( ic=se * qt((1-0.05)/2 + .5, n-1))
+
 
 
 
