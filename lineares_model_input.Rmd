@@ -32,8 +32,8 @@ master_df <- read.csv("master_df.csv")
 #von Merle eingefügt, damit alle NAs mit 0 ersetzt werden 
 master_df[is.na(master_df)] <- 0 
 
-
 master_df$Datum <- as.Date(master_df$Datum, format = "%Y-%m-%d")
+
 #X Spalte loeschen
 master_df$X<-NULL
 
@@ -42,9 +42,8 @@ master_df$X<-NULL
 Ja oder Nein Variablen als as.factor setzten
 ```{r}
 master_df$Wochentag<-as.factor(master_df$Wochentag)
-master_df$Sonntag<-as.factor(master_df$Sonntag)
-master_df$Samstag<-as.factor(master_df$Samstag)
-master_df$Samstag<-as.factor(master_df$Samstag)
+#master_df$Sonntag<-as.factor(master_df$Sonntag) (Variable rausgenommen, weil es ja schon im Wochentag ist -Merle)
+#master_df$Samstag<-as.factor(master_df$Samstag)(Variable rausgenommen, weil es ja schon im Wochentag ist -Merle)
 master_df$Monat<-as.factor(master_df$Monat)
 master_df$Weihnachtsmarkt<-as.factor(master_df$Weihnachtsmarkt)
 master_df$Ferien<-as.factor(master_df$Ferien)
