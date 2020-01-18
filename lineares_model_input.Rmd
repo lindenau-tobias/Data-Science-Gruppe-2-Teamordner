@@ -36,12 +36,16 @@ master_df$Datum <- as.Date(master_df$Datum, format = "%Y-%m-%d")
 
 #X Spalte loeschen
 master_df$X<-NULL
+#Monat_1 Spalte loeschen
+master_df$Monat_1<-NULL
 
+#Wochentage ausgeschrieben ranhängen 
+master_df$Wochentag<-as.factor(master_df$Wochentag)
 ```
 
 Ja oder Nein Variablen als as.factor setzten
 ```{r}
-master_df$Wochentag<-as.factor(master_df$Wochentag)
+
 #master_df$Sonntag<-as.factor(master_df$Sonntag) (Variable rausgenommen, weil es ja schon im Wochentag ist -Merle)
 #master_df$Samstag<-as.factor(master_df$Samstag)(Variable rausgenommen, weil es ja schon im Wochentag ist -Merle)
 master_df$Monat<-as.factor(master_df$Monat)
