@@ -28,6 +28,11 @@ Einlesen der Daten
 ```{r}
 # master df einlesen
 master_df <- read.csv("master_df.csv")
+
+#von Merle eingefügt, damit alle NAs mit 0 ersetzt werden 
+master_df[is.na(master_df)] <- 0 
+
+
 master_df$Datum <- as.Date(master_df$Datum, format = "%Y-%m-%d")
 #X Spalte loeschen
 master_df$X<-NULL
