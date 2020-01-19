@@ -136,17 +136,6 @@ weihnachtsfeiertage_all<-weihnachtsfeiertage_all %>% unite("w", c(w25, w26,w27),
 weihnachtsfeiertage_all$w<-str_remove_all(weihnachtsfeiertage_all$w, "[NA_]")
 
 
-
-
-
-#as.data.frame(weihnachtsfeiertage_all)
-
-
-#klappt es damit alle Weihnachtsfeiertage in einer df zu kombibieren? (Anm. Merle am 19.01)
-weihnachtsfeiertage_all<-weihnachtsfeiertage_all%>%
-  mutate(wtage = coalesce(Weihnachten_25,Weihnachten_26,Weihnachten_27)) %>%
-         select(ID,wtage)
-
 #Weihnachts data frame mit einer spalte erweitern und den wert 1 einfügen
 weihnachtsfeiertage_all$weihnachtsfeiertagetage_all=1
 
