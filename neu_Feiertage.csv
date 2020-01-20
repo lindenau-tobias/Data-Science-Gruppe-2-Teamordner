@@ -1,25 +1,24 @@
 Datum,Wochentag,Feiertagsbezeichnung,Bundesland,Feiertag
-01.01.17,Sonntag,Neujahrstag,Bundesweit ,1
-14.04.17,Freitag,Karfreitag,Bundesweit ,1
-17.04.17,Montag,Ostermontag,Bundesweit ,1
-01.05.17,Montag,Tag der Arbeit / 1. Mai,Bundesweit ,1
-25.05.17,Donnerstag,Christi Himmelfahrt,Bundesweit ,1
-05.06.17,Montag,Pfingstmontag,Bundesweit ,1
-03.10.17,Dienstag,Tag der Deutschen Einheit,Bundesweit ,1
-31.10.17,Dienstag,Reformationstag,"Bundesweit (einmalig, 500. Jahrestag)* ",1
-25.12.17,Montag,1. Weihnachtstag,Bundesweit ,1
-26.12.17,Dienstag,2. Weihnachtstag,Bundesweit ,1
-01.01.16,Freitag,Neujahrstag,Bundesweit ,1
-,,,,1
-25.03.16,Freitag,Karfreitag,Bundesweit ,1
-27.03.16,Sonntag,Ostersonntag,Brandenburg  ,1
-28.03.16,Montag,Ostermontag,Bundesweit ,1
-01.05.16,Sonntag,Tag der Arbeit / 1. Mai,Bundesweit ,1
-05.05.16,Donnerstag,Christi Himmelfahrt (Vatertag),Bundesweit ,1
-15.05.16,Sonntag,Pfingstsonntag,Brandenburg  ,1
-16.05.16,Montag,Pfingstmontag,Bundesweit ,1
-03.10.16,Montag,Tag der Deutschen Einheit,Bundesweit ,1
-31.10.16,Montag,Reformationstag,"Brandenburg
+01.01.2017,Sonntag,Neujahrstag,Bundesweit,1
+14.04.2017,Freitag,Karfreitag,Bundesweit,1
+17.04.2017,Montag,Ostermontag,Bundesweit,1
+01.05.2017,Montag,Tag der Arbeit / 1. Mai,Bundesweit,1
+25.05.2017,Donnerstag,Christi Himmelfahrt,Bundesweit,1
+05.06.2017,Montag,Pfingstmontag,Bundesweit,1
+03.10.2017,Dienstag,Tag der Deutschen Einheit,Bundesweit,1
+31.10.2017,Dienstag,Reformationstag,Bundesweit ,1
+25.12.2017,Montag,1. Weihnachtstag,Bundesweit,1
+26.12.2017,Dienstag,2. Weihnachtstag,Bundesweit,1
+01.01.2016,Freitag,Neujahrstag,Bundesweit,1
+25.03.2016,Freitag,Karfreitag,Bundesweit,1
+27.03.2016,Sonntag,Ostersonntag,Brandenburg ,1
+28.03.2016,Montag,Ostermontag,Bundesweit,1
+01.05.2016,Sonntag,Tag der Arbeit / 1. Mai,Bundesweit,1
+05.05.2016,Donnerstag,Christi Himmelfahrt (Vatertag),Bundesweit,1
+15.05.2016,Sonntag,Pfingstsonntag,Brandenburg ,1
+16.05.2016,Montag,Pfingstmontag,Bundesweit,1
+03.10.2016,Montag,Tag der Deutschen Einheit,Bundesweit,1
+31.10.2016,Montag,Reformationstag,"Brandenburg
 Bremen
 Hamburg
 Mecklenburg-Vorpommern
@@ -27,19 +26,19 @@ Niedersachsen
 Sachsen
 Sachsen-Anhalt
 Schleswig-Holstein
-Thüringen  ",1
-25.12.16,Sonntag,1. Weihnachtstag,Bundesweit ,1
-26.12.16,Montag,2. Weihnachtstag,Bundesweit ,1
-01.01.15,Donnerstag,Neujahrstag,Bundesweit ,1
-03.04.15,Freitag,Karfreitag,Bundesweit ,1
-05.04.15,Sonntag,Ostersonntag,Brandenburg  ,1
-06.04.15,Montag,Ostermontag,Bundesweit ,1
-01.05.15,Freitag,Tag der Arbeit / 1. Mai,Bundesweit ,1
-14.05.15,Donnerstag,Christi Himmelfahrt (Vatertag),Bundesweit ,1
-24.05.15,Sonntag,Pfingstsonntag,Brandenburg  ,1
-25.05.15,Montag,Pfingstmontag,Bundesweit ,1
-03.10.15,Samstag,Tag der Deutschen Einheit,Bundesweit ,1
-31.10.15,Samstag,Reformationstag,"Brandenburg
+Thueringen ",1
+25.12.2016,Sonntag,1. Weihnachtstag,Bundesweit,1
+26.12.2016,Montag,2. Weihnachtstag,Bundesweit,1
+01.01.2015,Donnerstag,Neujahrstag,Bundesweit,1
+03.04.2015,Freitag,Karfreitag,Bundesweit,1
+05.04.2015,Sonntag,Ostersonntag,Brandenburg ,1
+06.04.2015,Montag,Ostermontag,Bundesweit,1
+01.05.2015,Freitag,Tag der Arbeit / 1. Mai,Bundesweit,1
+14.05.2015,Donnerstag,Christi Himmelfahrt (Vatertag),Bundesweit,1
+24.05.2015,Sonntag,Pfingstsonntag,Brandenburg ,1
+25.05.2015,Montag,Pfingstmontag,Bundesweit,1
+03.10.2015,Samstag,Tag der Deutschen Einheit,Bundesweit,1
+31.10.2015,Samstag,Reformationstag,"Brandenburg
 Bremen
 Hamburg
 Mecklenburg-Vorpommern
@@ -47,19 +46,19 @@ Niedersachsen
 Sachsen
 Sachsen-Anhalt
 Schleswig-Holstein
-Thüringen  ",1
-25.12.15,Freitag,1. Weihnachtstag,Bundesweit ,1
-26.12.15,Samstag,2. Weihnachtstag,Bundesweit ,1
-01.01.14,Mittwoch,Neujahrstag,Bundesweit ,1
-18.04.14,Freitag,Karfreitag,Bundesweit ,1
-20.04.14,Sonntag,Ostersonntag,Brandenburg  ,1
-21.04.14,Montag,Ostermontag,Bundesweit ,1
-01.05.14,Donnerstag,Tag der Arbeit / 1. Mai,Bundesweit ,1
-29.05.14,Donnerstag,Christi Himmelfahrt (Vatertag),Bundesweit ,1
-08.06.14,Sonntag,Pfingstsonntag,Brandenburg  ,1
-09.06.14,Montag,Pfingstmontag,Bundesweit ,1
-03.10.14,Freitag,Tag der Deutschen Einheit,Bundesweit ,1
-31.10.14,Freitag,Reformationstag,"Brandenburg
+Thueringen ",1
+25.12.2015,Freitag,1. Weihnachtstag,Bundesweit,1
+26.12.2015,Samstag,2. Weihnachtstag,Bundesweit,1
+01.01.2014,Mittwoch,Neujahrstag,Bundesweit,1
+18.04.2014,Freitag,Karfreitag,Bundesweit,1
+20.04.2014,Sonntag,Ostersonntag,Brandenburg ,1
+21.04.2014,Montag,Ostermontag,Bundesweit,1
+01.05.2014,Donnerstag,Tag der Arbeit / 1. Mai,Bundesweit,1
+29.05.2014,Donnerstag,Christi Himmelfahrt (Vatertag),Bundesweit,1
+08.06.2014,Sonntag,Pfingstsonntag,Brandenburg ,1
+09.06.2014,Montag,Pfingstmontag,Bundesweit,1
+03.10.2014,Freitag,Tag der Deutschen Einheit,Bundesweit,1
+31.10.2014,Freitag,Reformationstag,"Brandenburg
 Bremen
 Hamburg
 Mecklenburg-Vorpommern
@@ -67,11 +66,11 @@ Niedersachsen
 Sachsen
 Sachsen-Anhalt
 Schleswig-Holstein
-Thüringen  ",1
-25.12.14,Donnerstag,1. Weihnachtstag,Bundesweit ,1
-26.12.14,Freitag,2. Weihnachtstag,Bundesweit ,1
-03.10.13,Donnerstag,Tag der Deutschen Einheit,Bundesweit ,1
-31.10.13,Donnerstag,Reformationstag,"Brandenburg
+Thueringen ",1
+25.12.2014,Donnerstag,1. Weihnachtstag,Bundesweit,1
+26.12.2014,Freitag,2. Weihnachtstag,Bundesweit,1
+03.10.2013,Donnerstag,Tag der Deutschen Einheit,Bundesweit,1
+31.10.2013,Donnerstag,Reformationstag,"Brandenburg
 Bremen
 Hamburg
 Mecklenburg-Vorpommern
@@ -79,19 +78,19 @@ Niedersachsen
 Sachsen
 Sachsen-Anhalt
 Schleswig-Holstein
-Thüringen  ",1
-25.12.13,Mittwoch,1. Weihnachtstag,Bundesweit ,1
-26.12.13,Donnerstag,2. Weihnachtstag,Bundesweit,1
-01.01.18,Montag,Neujahrstag,Bundesweit ,1
-30.03.18,Freitag,Karfreitag,Bundesweit ,1
-01.04.18,Sonntag,Ostersonntag,Brandenburg  ,1
-02.04.18,Montag,Ostermontag,Bundesweit ,1
-01.05.18,Dienstag,Tag der Arbeit / 1. Mai,Bundesweit ,1
-10.05.18,Donnerstag,Christi Himmelfahrt,Bundesweit ,1
-20.05.18,Sonntag,Pfingstsonntag,Brandenburg  ,1
-21.05.18,Montag,Pfingstmontag,Bundesweit ,1
-03.10.18,Mittwoch,Tag der Deutschen Einheit,Bundesweit ,1
-31.10.18,Mittwoch,Reformationstag,"Brandenburg
+Thueringen ",1
+25.12.2013,Mittwoch,1. Weihnachtstag,Bundesweit,1
+26.12.2013,Donnerstag,2. Weihnachtstag,Bundesweit,1
+01.01.2018,Montag,Neujahrstag,Bundesweit,1
+30.03.2018,Freitag,Karfreitag,Bundesweit,1
+01.04.2018,Sonntag,Ostersonntag,Brandenburg ,1
+02.04.2018,Montag,Ostermontag,Bundesweit,1
+01.05.2018,Dienstag,Tag der Arbeit / 1. Mai,Bundesweit,1
+10.05.2018,Donnerstag,Christi Himmelfahrt,Bundesweit,1
+20.05.2018,Sonntag,Pfingstsonntag,Brandenburg ,1
+21.05.2018,Montag,Pfingstmontag,Bundesweit,1
+03.10.2018,Mittwoch,Tag der Deutschen Einheit,Bundesweit,1
+31.10.2018,Mittwoch,Reformationstag,"Brandenburg
 Bremen
 Hamburg
 Mecklenburg-Vorpommern
@@ -99,24 +98,24 @@ Niedersachsen
 Sachsen
 Sachsen-Anhalt
 Schleswig-Holstein
-Thüringen  ",1
-01.11.18,Donnerstag,Allerheiligen,"Baden-Württemberg
+Thueringen ",1
+01.11.2018,Donnerstag,Allerheiligen,"Baden-Wuerttemberg
 Bayern
 Nordrhein-Westfalen
 Rheinland-Pfalz
-Saarland  ",1
-25.12.18,Dienstag,1. Weihnachtstag,Bundesweit ,1
-26.12.18,Mittwoch,2. Weihnachtstag,Bundesweit ,1
-01.01.19,Dienstag,Neujahrstag,Bundesweit ,1
-19.04.19,Freitag,Karfreitag,Bundesweit ,1
-21.04.19,Sonntag,Ostersonntag,Brandenburg  ,1
-22.04.19,Montag,Ostermontag,Bundesweit ,1
-01.05.19,Mittwoch,Tag der Arbeit / 1. Mai,Bundesweit ,1
-30.05.19,Donnerstag,Christi Himmelfahrt,Bundesweit ,1
-09.06.19,Sonntag,Pfingstsonntag,Brandenburg  ,1
-10.06.19,Montag,Pfingstmontag,Bundesweit ,1
-03.10.19,Donnerstag,Tag der Deutschen Einheit,Bundesweit ,1
-31.10.19,Donnerstag,Reformationstag,"Brandenburg
+Saarland ",1
+25.12.2018,Dienstag,1. Weihnachtstag,Bundesweit,1
+26.12.2018,Mittwoch,2. Weihnachtstag,Bundesweit,1
+01.01.2019,Dienstag,Neujahrstag,Bundesweit,1
+19.04.2019,Freitag,Karfreitag,Bundesweit,1
+21.04.2019,Sonntag,Ostersonntag,Brandenburg ,1
+22.04.2019,Montag,Ostermontag,Bundesweit,1
+01.05.2019,Mittwoch,Tag der Arbeit / 1. Mai,Bundesweit,1
+30.05.2019,Donnerstag,Christi Himmelfahrt,Bundesweit,1
+09.06.2019,Sonntag,Pfingstsonntag,Brandenburg ,1
+10.06.2019,Montag,Pfingstmontag,Bundesweit,1
+03.10.2019,Donnerstag,Tag der Deutschen Einheit,Bundesweit,1
+31.10.2019,Donnerstag,Reformationstag,"Brandenburg
 Bremen
 Hamburg
 Mecklenburg-Vorpommern
@@ -124,6 +123,6 @@ Niedersachsen
 Sachsen
 Sachsen-Anhalt
 Schleswig-Holstein
-Thüringen  ",1
-25.12.19,Mittwoch,1. Weihnachtstag,Bundesweit ,1
-26.12.19,Donnerstag,2. Weihnachtstag,Bundesweit ,1
+Thueringen ",1
+25.12.2019,Mittwoch,1. Weihnachtstag,Bundesweit,1
+26.12.2019,Donnerstag,2. Weihnachtstag,Bundesweit,1
