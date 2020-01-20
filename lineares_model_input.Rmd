@@ -105,14 +105,17 @@ summary(modx)
 
 rbind(glance(mod1), glance(mod2), glance(mod3), glance(mod4), glance(mod5), glance(mod6), glance(mod7))
 ```
-```
 
 
 modelle plotten
 ```{r}
-lmTemp = lm(Pressure~Temperature, data = pressure) #Create the linear regression
-plot(pressure, pch = 16, col = "blue") #Plot the results
-abline(lmTemp) #Add a regression line
+#BEISPIEL
+#lmTemp = lm(Pressure~Temperature, data = pressure) #Create the linear regression
+#plot(pressure, pch = 16, col = "blue") #Plot the results
+#abline(lmTemp) #Add a regression line
+
+#plot(master_df$Gesamtumsatz, pch = 16, col = "blue")
+#abline(mod6)
 ```
 
 
