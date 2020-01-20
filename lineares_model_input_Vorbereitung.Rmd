@@ -128,8 +128,8 @@ master_df_vorlaeufig<-left_join(master_df_vorlaeufig,Feiertage , by = "Datum")
 #Neu generierte SPalte mit X rausloeschen
 master_df_vorlaeufig$X<-NULL
 master_df_vorlaeufig$X1<-NULL
-
-
+master_df_vorlaeufig$Sonntag<-NULL
+master_df_vorlaeufig$Samstag<-NULL
 
 #Feiertage+kiwo+wetter+feiertage_master+temp_klass --> gibt 10788 zeilen daher müssen in der nächsten Zeile die doppelten Zeilen entfernt werden
 master_df_vorlaeufig<-left_join(master_df_vorlaeufig,temp_klass , by = "Datum")
@@ -170,9 +170,9 @@ master_df<-master_df_vorlaeufig
 Ja oder Nein Variablen als as.factor setzten
 ```{r}
 master_df$Wochentag<-as.factor(master_df$Wochentag)
-master_df$Sonntag<-as.factor(master_df$Sonntag)
-master_df$Samstag<-as.factor(master_df$Samstag)
-master_df$Samstag<-as.factor(master_df$Samstag)
+#master_df$Sonntag<-as.factor(master_df$Sonntag)
+#master_df$Samstag<-as.factor(master_df$Samstag)
+#master_df$Samstag<-as.factor(master_df$Samstag)
 master_df$Monat<-as.factor(master_df$Monat)
 master_df$Weihnachtsmarkt<-as.factor(master_df$Weihnachtsmarkt)
 master_df$Ferien<-as.factor(master_df$Ferien)
@@ -182,7 +182,7 @@ master_df$weihnachtsfeiertag_27<-as.factor(master_df$weihnachtsfeiertag_27)
 master_df$neujahrstage<-as.factor(master_df$neujahrstage)
 master_df$KielerWoche<-as.factor(master_df$KielerWoche)
 master_df$Wettercode<-as.factor(master_df$Wettercode)
-master_df$feiertage<-as.factor(master_df$feiertage)
+master_df$Feiertag<-as.factor(master_df$Feiertag)
 master_df$Temperaturklassen<-as.factor(master_df$Temperaturklassen)
 master_df$nach_feiertag<-as.factor(master_df$nach_feiertag)
 master_df$vor_feiertag<-as.factor(master_df$vor_feiertag)
