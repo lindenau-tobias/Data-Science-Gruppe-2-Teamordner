@@ -83,16 +83,26 @@ mod2 <- lm(Gesamtumsatz ~ Ware_1+ Ware_2 + Ware_3, master_df)
 mod3 <- lm(Gesamtumsatz ~ Ware_1+ Ware_2 + Ware_3 + Ware_4, master_df)
 mod4 <- lm(Gesamtumsatz ~ Ware_1+ Ware_2 + Ware_3 + Ware_4 + Ware_5, master_df)
 mod5 <- lm(Gesamtumsatz ~ Ware_1+ Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6, master_df)
-mod6 <- lm(Gesamtumsatz ~ Ware_1+ Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + Wochentag, master_df) #sehr kleine Verbesserung
-mod7 <- lm(Gesamtumsatz ~ Ware_1+ Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + Wochentag + Ferien, master_df) #Sehr kleine Verschlechterung
+mod6 <- lm(Gesamtumsatz ~ Ware_1 + Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + as.factor(Temperaturklassen), master_df) #76% Testsieger
+#mod6 <- lm(Gesamtumsatz ~ Ware_1+ Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + Wochentag, master_df) #sehr kleine Verbesserung
+mod7 <- lm(Gesamtumsatz ~ Ware_1 + Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + as.factor(Temperaturklassen) + as.factor(Wettercode), master_df) 
+#mod7 <- lm(Gesamtumsatz ~ Ware_1+ Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + Wochentag + Ferien, master_df) #Sehr kleine Verschlechterung
 
 
-summary(mod1)
+summary(mod6)
+
+
 
 ```
+```{r}
+modx <- lm(Gesamtumsatz ~ Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6, master_df)
+summary(modx)
+```
+
 
 ```{r}
 # Preparation of Model Results
+
 rbind(glance(mod1), glance(mod2), glance(mod3), glance(mod4), glance(mod5), glance(mod6), glance(mod7))
 ```
 ```
