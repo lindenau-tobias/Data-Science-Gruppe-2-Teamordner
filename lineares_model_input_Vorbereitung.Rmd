@@ -83,7 +83,14 @@ temp_klass$Windgeschwindigkeit <-NULL
 temp_klass$Wettercode <-NULL
 
 #mutate(temp_klass, Datum= as.Date(Datum, format= "%Y-%m-%d")) # hat nicht funktioniert
+#feiertage hinzufügen (Anm. Merle am 20.01.  mit aktualiserten daten)
 
+Feiertage <- read_csv("neu_Feiertage.csv", 
+    col_types = cols(Datum = col_date(format = "%d.%m.%Y")))
+#Überflüssige Spalten in der Datei löschen 
+Feiertage$Wochentag<-NULL
+Feiertage$Feiertagsbezeichnung<-NULL
+Feiertage$Bundesland<-NULL
 
 #nach Feiertag
 nach_feiertag <- read.csv("nach_feiertag.csv")
@@ -113,7 +120,11 @@ master_df_vorlaeufig<-left_join(master_df_vorlaeufig,wetter , by = "Datum")
 
 
 #Feiertage+kiwo+wetter+feiertage_master --> gibt 2161 zeilen Klappt
-master_df_vorlaeufig<-left_join(master_df_vorlaeufig,feiertage_master , by = "Datum")
+#master_df_vorlaeufig<-left_join(master_df_vorlaeufig,feiertage_master , by = "Datum")
+
+#überarbeitete Feiertagsdatei hinzufügen (Anm. Merle 20.01.)
+master_df_vorlaeufig<-left_join(master_df_vorlaeufig,Feiertage , by = "Datum")
+
 #Neu generierte SPalte mit X rausloeschen
 master_df_vorlaeufig$X<-NULL
 master_df_vorlaeufig$X1<-NULL
