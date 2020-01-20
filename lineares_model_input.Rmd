@@ -78,10 +78,33 @@ master_df <- master_df %>%
 
 Modellgleichung
 ```{r}
-mod1 <- lm(Gesamtumsatz ~ KielerWoche, master_df)
+mod1 <- lm(Gesamtumsatz ~ Ware_1, master_df)
+mod2 <- lm(Gesamtumsatz ~ Ware_1+ Ware_2 + Ware_3, master_df)
+mod3 <- lm(Gesamtumsatz ~ Ware_1+ Ware_2 + Ware_3 + Ware_4, master_df)
+mod4 <- lm(Gesamtumsatz ~ Ware_1+ Ware_2 + Ware_3 + Ware_4 + Ware_5, master_df)
+mod5 <- lm(Gesamtumsatz ~ Ware_1+ Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6, master_df)
+mod6 <- lm(Gesamtumsatz ~ Ware_1+ Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + Wochentag, master_df) #sehr kleine Verbesserung
+mod7 <- lm(Gesamtumsatz ~ Ware_1+ Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + Wochentag + Ferien, master_df) #Sehr kleine Verschlechterung
+
+
 summary(mod1)
 
 ```
+
+```{r}
+# Preparation of Model Results
+rbind(glance(mod1), glance(mod2), glance(mod3), glance(mod4), glance(mod5), glance(mod6), glance(mod7))
+```
+```
+
+
+modelle plotten
+```{r}
+lmTemp = lm(Pressure~Temperature, data = pressure) #Create the linear regression
+plot(pressure, pch = 16, col = "blue") #Plot the results
+abline(lmTemp) #Add a regression line
+```
+
 
 ```{r}
 mod1 <- lm(Gesamtumsatz ~ Wochentag + Sonntag + Samstag + Monat + Weihnachtsmarkt + Ferien + Monat + Ware_1 + Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + weihnachtsfeiertag_25 + weihnachtsfeiertag_26 + weihnachtsfeiertag_27 + neujahrstage + KielerWoche, master_df)
