@@ -125,14 +125,24 @@ Weihnachten_26<-as.data.frame(as.Date("2013-12-26") %m+% years(c(0:5)))
 Weihnachten_27<-as.data.frame(as.Date("2013-12-27") %m+% years(c(0:5)))
 
 weihnachtsfeiertage_all<-bind_rows(Weihnachten_25,Weihnachten_26, Weihnachten_27)
+colnames(weihnachtsfeiertage_all) <- c("w25", "w26", "w27")
+
+#row id dem df_all hinzufügen. Dies erleichtert das mergen aller Weihnachtsfeiertage in eine df 
+weihnachtsfeiertage_all$ID <- seq.int(nrow(weihnachtsfeiertage_all))
+
+
+weihnachtsfeiertage_all<-weihnachtsfeiertage_all %>% unite("w", c(w25, w26,w27),  na.rm =FALSE, remove = FALSE)
+
+weihnachtsfeiertage_all$w<-str_remove_all(weihnachtsfeiertage_all$w, "[NA_]")
 
 
 #Weihnachts data frame mit einer spalte erweitern und den wert 1 einfügen
 weihnachtsfeiertage_all$weihnachtsfeiertagetage_all=1
 
 
-#row id dem df_all hinzufügen. Dies erleichtert das mergen aller Weihnachtsfeiertage in eine df 
-weihnachtsfeiertage_all$ID <- seq.int(nrow(weihnachtsfeiertage_all))
+
+
+
 
 #---->  Schönheitsfehler beim Weihnachtsfeiertage mergen. Könnte allerdings trozdem genutz werden
 
