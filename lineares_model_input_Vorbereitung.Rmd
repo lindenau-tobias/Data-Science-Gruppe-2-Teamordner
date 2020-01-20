@@ -29,11 +29,6 @@ besonderes_weihnachtsfeiertage_neujahr<-read_csv("besonderes_weihnachtsfeiertage
 
 mutate(besonderes_weihnachtsfeiertage_neujahr, Datum= as.Date(Datum, format= "%Y-%m-%d"))
 
-#X Spalte loeschen
-besonderes_weihnachtsfeiertage_neujahr$X<-NULL
-#Feiertage Spalte loeschen, da diese kein Neujahr und Weihnachten enthält
-besonderes_weihnachtsfeiertage_neujahr$Feiertage<-NULL
-
 
 # Kiwo
 kiwo <- read.csv("kiwo.csv")
@@ -92,7 +87,6 @@ Variablen zusammenführen
 #Datensatz allgemein  +kiwo 
 master_df_vorlaeufig<-left_join(besonderes_weihnachtsfeiertage_neujahr, kiwo, by = "Datum")
 
-
 #Feiertage+kiwo+wetter 
 master_df_vorlaeufig<-left_join(master_df_vorlaeufig,wetter , by = "Datum")
 
@@ -100,9 +94,6 @@ master_df_vorlaeufig<-left_join(master_df_vorlaeufig,wetter , by = "Datum")
 master_df_vorlaeufig<-left_join(master_df_vorlaeufig,Feiertage , by = "Datum")
 master_df_vorlaeufig<-left_join(master_df_vorlaeufig,vor_feiertag , by = "Datum")
 master_df_vorlaeufig<-left_join(master_df_vorlaeufig,nach_feiertag , by = "Datum")
-
-#Wochentage ausgeschrieben ranhängen 
-master_df_vorlaeufig$Wochentagname<-as.factor(master_df_vorlaeufig$Wochentag)
 
 #Feiertage+kiwo+wetter+feiertage_master+temp_klass 
 master_df_vorlaeufig<-left_join(master_df_vorlaeufig,temp_klass , by = "Datum")
@@ -151,6 +142,6 @@ master_df$nach_feiertag<-as.factor(master_df$nach_feiertag)
 master df als csv speichern
 ```{r}
 
-write.csv(master_df, file = "master_df.csv")
+write.csv (master_df, file = "master_df.csv")
 
 ```
