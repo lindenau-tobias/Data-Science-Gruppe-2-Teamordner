@@ -31,6 +31,9 @@ nach_Feiertag<-Feiertage$Datum+days(1)
 vor_Feiertag<-as.data.frame(vor_Feiertag)
 nach_Feiertag<-as.data.frame(nach_Feiertag)
 
+#neue Überschrift geben
+colnames(vor_Feiertag)<-"Datum"
+colnames(nach_Feiertag)<-"Datum"
 
 #nach Feiertag data frame mit einer spalte erweitern und den wert 1 einfügen
 vor_Feiertag$vor_feiertag=1
