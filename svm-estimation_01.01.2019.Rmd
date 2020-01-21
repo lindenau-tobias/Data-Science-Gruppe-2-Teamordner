@@ -12,7 +12,6 @@ Von Tobias Lindenau
 # Importing Function Packages
 
 library(dataPreparation)
-
 library(readr)
 library(e1071)
 library(Metrics)
@@ -36,7 +35,7 @@ master_df$X<-NULL
 Trainings- und Testdatensatz erzeugen. Vorbereitungen
 ```{r}
 library(ISLR)
-attach(master_df)
+#attach(master_df)
 smp_siz = floor(0.75*nrow(master_df))  # creates a value for dividing the data into train and test. In this case the value is defined as 75% of the number of rows in the dataset
 smp_siz  # shows the value of the sample size
 ```
@@ -92,50 +91,69 @@ X_test$education_num = NULL
 
 # Option to check the correctnes of the code with a small (and computationally fast) training data set
 # Do not run or uncomment the following line if you want to reduce the dataset size
-###house_pricing_train <- sample_frac(house_pricing_train, .10)
+###train <- sample_frac(train, .10)
 ```
 
 
 
+### model_svm ###
 ```{r}
 #################
 # Training the SVM
 
 # Estimation of an SVM with optimized weighting parameters and given standard hyper parameters
 # Typically not used; instead, the function svm_tune is used in order to also get a model with optimized hyper parameters
-#model_svm <- svm(price ~ bathrooms, house_pricing_train)
+model_svm <- svm(Gesamtumsatz ~ Ware_1, train)
 
-# Estimation of various SVM (each with optimized weighting parameters) using systematically varied hyper parameters (typically called 'grid search' approach) and cross validation
-# the resulting object includes the optimal model in the element named 'best.model'
-svm_tune <- tune(svm, Gesamtumsatz ~ Ware_1 + Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + as.factor(Temperaturklassen), data=master_df, ranges = list(epsilon = seq(0.2,1,0.1), cost = 2^(2:3)))
+print(model_svm)
+summary(model_svm)
+
+```
+
+# estimate model and predict input values
+#Beispiel
+#m   <- svm(x, y)
+#new <- predict(m, x)
+
+```{r}
+# test with train data
+pred_train_model_svm <- predict(model_svm, master_df)
+
+View(pred_train_model_svm)
+
+# compute decision values and probabilites
+pred_train_model_svm <- predict(model_svm, Gesamtumsatz)
+attr(pred, "decision.values")[1:4,]
+attr(pred, "probabilities")[1:4,]
 
 ```
 
 
+
+### SVM_TUNE ###
+```{r}
+# Estimation of various SVM (each with optimized weighting parameters) using systematically varied hyper parameters (typically called 'grid search' approach) and cross validation
+# the resulting object includes the optimal model in the element named 'best.model'
+#Beispiel: svm_tune <- tune(svm, price ~ bedrooms + bathrooms + sqft_living + zipcode, data=house_pricing_train, ranges = list(epsilon = seq(0.2,1,0.1), cost = 2^(2:3)))
+svm_tune <- tune(svm, Gesamtumsatz ~ Ware_1 + Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + as.factor(Temperaturklassen), data=train, ranges = list(epsilon = seq(0.2,1,0.1), cost = 2^(2:3)))
+```
 
 ```{r}
 #################
 # Checking the prediction Quality
 
 # Calculating the prediction for the training data using the best model according to the grid search
-pred_train <- predict(svm_tune$best.model, house_pricing_train)
+pred_train <- predict(svm_tune$best.model, train)
 
 # Calculating the prediction for the test data using the best model according to the grid search
-pred_test <- predict(svm_tune$best.model, house_pricing_test)
+pred_test <- predict(svm_tune$best.model, test)
 
 # Calculating the prediction quality for the training data using the MAPE
-mape(house_pricing_train$price, pred_train)
+mape(train$Gesamtumsatz, pred_train)
 
 # Calculating the prediction quality for the training data using the MAPE
-mape(house_pricing_test$price, pred_test)
+mape(test$Gesamtumsatz, pred_test)
 ```
-
-
-
-
-
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
-
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
-
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+```{r}
+predict()
+```
