@@ -29,32 +29,22 @@ Einlesen der Daten
 # master df einlesen
 master_df <- read.csv("master_df.csv")
 
-#von Merle eingefügt, damit alle NAs mit 0 ersetzt werden 
-master_df[is.na(master_df)] <- 0 
+
 
 master_df$Datum <- as.Date(master_df$Datum, format = "%Y-%m-%d")
 
 #X Spalte loeschen
 master_df$X<-NULL
-#Monat_1 Spalte loeschen
-master_df$Monat_1<-NULL
 
-#Wochentage ausgeschrieben ranhängen 
-master_df$Wochentag<-as.factor(master_df$Wochentag)
 ```
 
 Ja oder Nein Variablen als as.factor setzten
 ```{r}
 
-#master_df$Sonntag<-as.factor(master_df$Sonntag) (Variable rausgenommen, weil es ja schon im Wochentag ist -Merle)
-#master_df$Samstag<-as.factor(master_df$Samstag)(Variable rausgenommen, weil es ja schon im Wochentag ist -Merle)
+
 master_df$Monat<-as.factor(master_df$Monat)
 master_df$Weihnachtsmarkt<-as.factor(master_df$Weihnachtsmarkt)
 master_df$Ferien<-as.factor(master_df$Ferien)
-master_df$weihnachtsfeiertag_25<-as.factor(master_df$weihnachtsfeiertag_25)
-master_df$weihnachtsfeiertag_26<-as.factor(master_df$weihnachtsfeiertag_26)
-master_df$weihnachtsfeiertag_27<-as.factor(master_df$weihnachtsfeiertag_27)
-master_df$neujahrstage<-as.factor(master_df$neujahrstage)
 #master_df$KielerWoche<-as.factor(master_df$KielerWoche)
 master_df$Wettercode<-as.factor(master_df$Wettercode)
 master_df$Feiertag<-as.factor(master_df$Feiertag)
@@ -73,6 +63,9 @@ Na Value mit 0 ersetzten
 ```{r}
 master_df <- master_df %>%
     mutate(KielerWoche = if_else(is.na(KielerWoche), 0, KielerWoche))
+
+#von Merle eingefügt, damit alle NAs mit 0 ersetzt werden  klappte gerstern aber nicht heute
+#master_df[is.na(master_df)] <- 0 
 ```
 
 

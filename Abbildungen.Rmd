@@ -21,17 +21,11 @@ library(dplyr)
 ```{r}
 # master df einlesen
 master_df <- read.csv("master_df.csv")
-master_df[is.na(master_df)] <- 0 
+#master_df[is.na(master_df)] <- 0 
 master_df$Datum <- as.Date(master_df$Datum, format = "%Y-%m-%d")
 
-#X Spalte loeschen
-master_df$X<-NULL
-
-#Monat_1 Spalte löschen (von Merle eingefügt)
-master_df$Monat_1<-NULL
-
 #Variable mit dem ausgeschrieben Wochentag erzeugen (von Merle eingefügt)
-master_df$wochentag <- weekdays(master_df$Datum)
+#master_df$wochentag <- weekdays(master_df$Datum)
 ```
 
 
@@ -84,7 +78,7 @@ ggplot(grafik_monat) +
 ```{r}
 
 #Datensatz auf die interessanten Variablen herunterbrechen 
-Feiertage<-select(master_df, Datum, vor_feiertag, nach_feiertag, feiertage )
+Feiertage<-select(master_df, Datum, vor_feiertag, nach_feiertag, Feiertag)
 
 #den Wert 1 durch das Statement ersetzten 
 Feiertage<-Feiertage %>% 
@@ -97,15 +91,15 @@ Feiertage<-Feiertage %>%
 
 
 Feiertage<-Feiertage %>% 
-  mutate(feiertage = as.character(feiertage)) %>% 
-  mutate(feiertage = replace(feiertage, feiertage == 1, 'feiertage'))
+  mutate(Feiertag = as.character(Feiertag)) %>% 
+  mutate(Feiertag = replace(Feiertag, Feiertag == 1, 'Feiertag'))
 
 #die Werte o durch NA ersetzten
 Feiertage[Feiertage == 0] <- NA
 
 #die Spalte in eine Reihe tun
 
-Feiertage<-Feiertage %>% mutate(ftag = coalesce(vor_feiertag,nach_feiertag,feiertage)) %>%
+Feiertage<-Feiertage %>% mutate(ftag = coalesce(vor_feiertag,nach_feiertag, Feiertag)) %>%
          select(Datum,ftag)
 
 
@@ -116,9 +110,6 @@ umsatz$Datum<- as.Date(umsatz$Datum, format = "%Y-%m-%d")
 #einen left_join machen, um die beiden df`s zusammenzufügen 
 Feiertage<-left_join(umsatz, Feiertage, by= "Datum")
 
-#jetzt müssen die werte in die Spalte geschrieben werden und nicht als Überschrift
-#Feiertage_a<-Feiertage %>% gather ("vor_feiertag", "nach_feiertag", "feiertage" , key = "Feiertag")
-#das klappt nicht (es ersetzt alle)
 
 
 
@@ -133,7 +124,8 @@ grafik_feiertag<- Feiertage %>%
   mutate( se=sd/sqrt(n))  %>%
   mutate( ic=se * qt((1-0.05)/2 + .5, n-1))
 
-
+#alle NAs rausschmeißen
+grafik_feiertag<-na.omit(grafik_feiertag)
 
 #Bild mit Koinfidenzintervall
 # Confidence Interval
@@ -141,8 +133,9 @@ ggplot(grafik_feiertag) +
   geom_bar( aes(x=ftag, y=mean), stat="identity", fill="forestgreen", alpha=0.5) +
   geom_errorbar( aes(x=ftag, ymin=mean-ic, ymax=mean+ic), width=0.4, colour="orange", alpha=0.9, size=1.5) +
    ylab("Durchschnitt (€)")+
+  xlab("Feiertage")+
   facet_wrap(~Warengruppe)+
-  ggtitle("Durchschnittlicher Umsatz im Verhältnis der Warengruppe über alle Warengruppen")
+  ggtitle("Umsätze vor, während und nach einem Feiertag")
 
 
 ```

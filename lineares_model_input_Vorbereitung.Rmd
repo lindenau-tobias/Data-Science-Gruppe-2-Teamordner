@@ -9,6 +9,7 @@ output: html_notebook
 #Autor: "Tobias Lindenau"
 #Datum des Erstellens: 14.01.2020
 
+#stark geändert von Merle am 20.01.2020 (falls was nicht mehr klappt)
 
 ```{r}
 #Bibliotheken
@@ -23,131 +24,81 @@ library(magrittr)
 
 Einlesen der Daten GEÄNDERT!!!!
 ```{r}
-#Feiertage master df (enthält alle Feiertage inklusive Weihnachten, Neujahr. Diese hatten bisher gefehlt)
-feiertage_master <- read.csv("feiertage_master.csv")
-feiertage_master$Datum <- as.Date(feiertage_master$Datum, format = "%Y-%m-%d")
-#X Spalte loeschen
-feiertage_master$X1<-NULL
-
-
 #Feiertage, Ferien, Weihnachtsmarkt, Wochentage, Gesamtumsatz, Umsatz nach Warengruppen 1-6
 besonderes_weihnachtsfeiertage_neujahr<-read_csv("besonderes_weihnachtsfeiertage_neujahr.csv") 
-#                       ",", escape_double = FALSE, col_types = cols(Datum = col_date(format = "%d.%m.%Y")), 
-#                       trim_ws = TRUE)
-# gelöscht, da sonst das Datum nicht mehr angezeigt wird
+
 mutate(besonderes_weihnachtsfeiertage_neujahr, Datum= as.Date(Datum, format= "%Y-%m-%d"))
-
-#X Spalte loeschen
-besonderes_weihnachtsfeiertage_neujahr$X<-NULL
-#Feiertage Spalte loeschen, da diese kein Neujahr und Weihnachten enthält
-besonderes_weihnachtsfeiertage_neujahr$Feiertage<-NULL
-
-
-# Umsatzdaten, 
-#umsatz <- read_csv("umsatzdaten_gekuerzt.csv", 
-#                                 col_types = cols(Datum = col_date(format = "%Y-%m-%d"))) #Eingeben des Datums
 
 
 # Kiwo
 kiwo <- read.csv("kiwo.csv")
 kiwo$Datum <- as.Date(kiwo$Datum, format = "%Y-%m-%d")
 
-#mutate(kiwo$Datum = as.Date(Datum, format= "%Y-%m-%d")) # hat nicht funktioniert
-
 # Wetter
 wetter <- read_csv("wetter.csv")
 wetter$Datum <- as.Date(wetter$Datum, format = "%Y-%m-%d")
-#Eingeben des Datums
 
 #Temperaturklassen
 temp_klass<-read.csv("merge_um_wet_temp_klass.csv")
 temp_klass$Datum <- as.Date(temp_klass$Datum, format = "%Y-%m-%d")
-#X Spalte loeschen
+
+#Überflüssige Spalten loeschen
 temp_klass$X <-NULL
-#Warengruppe Spalte loeschen
 temp_klass$Warengruppe <-NULL
-
-#Umsatz SPalte löschen
 temp_klass$Umsatz <-NULL
-
-#Bewoelkung SPalte löschen
 temp_klass$Bewoelkung <-NULL
-
-#Temp
 temp_klass$Temperatur <-NULL
-
-#Wind
 temp_klass$Windgeschwindigkeit <-NULL
-
-#Wettercode
 temp_klass$Wettercode <-NULL
 
-#mutate(temp_klass, Datum= as.Date(Datum, format= "%Y-%m-%d")) # hat nicht funktioniert
+
 #feiertage hinzufügen (Anm. Merle am 20.01.  mit aktualiserten daten)
 
 Feiertage <- read_csv("neu_Feiertage.csv", 
-    col_types = cols(Datum = col_date(format = "%d.%m.%Y")))
-#Überflüssige Spalten in der Datei löschen 
-Feiertage$Wochentag<-NULL
-Feiertage$Feiertagsbezeichnung<-NULL
-Feiertage$Bundesland<-NULL
-
-#nach Feiertag
-nach_feiertag <- read.csv("nach_feiertag.csv")
-nach_feiertag$Datum <- as.Date(nach_feiertag$Datum, format = "%Y-%m-%d")
-#X Spalte loeschen
-nach_feiertag$X<-NULL
+    col_types = cols(Bundesland = col_skip(), 
+        Datum = col_date(format = "%d.%m.%Y"), 
+        Feiertagsbezeichnung = col_skip(), 
+        Wochentag = col_skip()))
 
 
-#vor Feiertag
-vor_feiertag <- read.csv("vor_feiertag.csv")
-vor_feiertag$Datum <- as.Date(vor_feiertag$Datum, format = "%Y-%m-%d")
-#X Spalte loeschen
-vor_feiertag$X<-NULL
+#Vorfeiertag und Nachfeiertag einfügen (Anm. Merle am 20.01.  mit aktualiserten daten)
+
+vor_feiertag <- read_csv("vor_feiertag.csv", 
+    col_types = cols(X1 = col_skip(), vor_Feiertag = col_date(format = "%Y-%m-%d")))
 
 
+
+#nach_feiertag <- read_csv("nach_feiertag.csv", 
+#    col_types = cols(X1 = col_skip(), nach_Feiertag = col_date(format = "%Y-%m-%d")))
+
+nach_feiertag <- read_csv("nach_feiertag.csv", 
+    col_types = cols(Datum = col_date(format = "%Y-%m-%d")))
+
+nach_feiertag$X1<-NULL
 
 ```
 
+
+
+
+
 Variablen zusammenführen
 ```{r}
-#Feiertage+kiwo --> gibt 2161 zeilen Klappt
+#Datensatz allgemein  +kiwo 
 master_df_vorlaeufig<-left_join(besonderes_weihnachtsfeiertage_neujahr, kiwo, by = "Datum")
 
-
-#Feiertage+kiwo+wetter --> gibt 2161 zeilen Klappt
+#Feiertage+kiwo+wetter 
 master_df_vorlaeufig<-left_join(master_df_vorlaeufig,wetter , by = "Datum")
-
-
-#Feiertage+kiwo+wetter+feiertage_master --> gibt 2161 zeilen Klappt
-#master_df_vorlaeufig<-left_join(master_df_vorlaeufig,feiertage_master , by = "Datum")
 
 #überarbeitete Feiertagsdatei hinzufügen (Anm. Merle 20.01.)
 master_df_vorlaeufig<-left_join(master_df_vorlaeufig,Feiertage , by = "Datum")
-
-#Neu generierte SPalte mit X rausloeschen
-master_df_vorlaeufig$X<-NULL
-master_df_vorlaeufig$X1<-NULL
-master_df_vorlaeufig$Sonntag<-NULL
-master_df_vorlaeufig$Samstag<-NULL
-
-#Feiertage+kiwo+wetter+feiertage_master+temp_klass --> gibt 10788 zeilen daher müssen in der nächsten Zeile die doppelten Zeilen entfernt werden
-master_df_vorlaeufig<-left_join(master_df_vorlaeufig,temp_klass , by = "Datum")
-#duplicate entfernen
-master_df_vorlaeufig<-distinct(master_df_vorlaeufig)
-
-
-
-#Feiertage+kiwo+wetter+feiertage_master+temp_klass+nach_feiertag --> gibt 2232 zeilen daher müssen in der nächsten Zeile die doppelten Zeilen entfernt werden
-master_df_vorlaeufig<-left_join(master_df_vorlaeufig,nach_feiertag , by = "Datum")
-#duplicate entfernen
-master_df_vorlaeufig<-distinct(master_df_vorlaeufig)
-
-
-
-#Feiertage+kiwo+wetter+feiertage_master+temp_klass+nach_feiertag+vor_feiertag --> gibt 2232 zeilen daher müssen in der nächsten Zeile die doppelten Zeilen entfernt werden
 master_df_vorlaeufig<-left_join(master_df_vorlaeufig,vor_feiertag , by = "Datum")
-#duplicate entfernen
+master_df_vorlaeufig<-left_join(master_df_vorlaeufig,nach_feiertag , by = "Datum")
+
+#Feiertage+kiwo+wetter+feiertage_master+temp_klass 
+master_df_vorlaeufig<-left_join(master_df_vorlaeufig,temp_klass , by = "Datum")
+
+# sämtliche duplicates entfernen
 master_df_vorlaeufig<-distinct(master_df_vorlaeufig)
 
 ```
@@ -159,7 +110,11 @@ master_df_vorlaeufig$Bewoelkung.y<-NULL
 master_df_vorlaeufig$Temperatur.y<-NULL
 master_df_vorlaeufig$Windgeschwindigkeit.y<-NULL
 master_df_vorlaeufig$Wettercode.y<-NULL
-
+master_df_vorlaeufig$X<-NULL
+master_df_vorlaeufig$X1<-NULL
+master_df_vorlaeufig$Sonntag<-NULL
+master_df_vorlaeufig$Samstag<-NULL
+master_df_vorlaeufig$Monat_1<-NULL
 ```
 
 master_df erstellen
@@ -170,28 +125,23 @@ master_df<-master_df_vorlaeufig
 Ja oder Nein Variablen als as.factor setzten
 ```{r}
 master_df$Wochentag<-as.factor(master_df$Wochentag)
-#master_df$Sonntag<-as.factor(master_df$Sonntag)
-#master_df$Samstag<-as.factor(master_df$Samstag)
-#master_df$Samstag<-as.factor(master_df$Samstag)
 master_df$Monat<-as.factor(master_df$Monat)
 master_df$Weihnachtsmarkt<-as.factor(master_df$Weihnachtsmarkt)
 master_df$Ferien<-as.factor(master_df$Ferien)
-master_df$weihnachtsfeiertag_25<-as.factor(master_df$weihnachtsfeiertag_25)
-master_df$weihnachtsfeiertag_26<-as.factor(master_df$weihnachtsfeiertag_26)
-master_df$weihnachtsfeiertag_27<-as.factor(master_df$weihnachtsfeiertag_27)
-master_df$neujahrstage<-as.factor(master_df$neujahrstage)
 master_df$KielerWoche<-as.factor(master_df$KielerWoche)
 master_df$Wettercode<-as.factor(master_df$Wettercode)
 master_df$Feiertag<-as.factor(master_df$Feiertag)
 master_df$Temperaturklassen<-as.factor(master_df$Temperaturklassen)
-master_df$nach_feiertag<-as.factor(master_df$nach_feiertag)
 master_df$vor_feiertag<-as.factor(master_df$vor_feiertag)
+master_df$nach_feiertag<-as.factor(master_df$nach_feiertag)
+
 
 ```
+
 
 master df als csv speichern
 ```{r}
 
-write.csv(master_df, file = "master_df.csv")
+write.csv (master_df, file = "master_df.csv")
 
 ```
