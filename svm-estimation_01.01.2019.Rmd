@@ -2,24 +2,89 @@
 title: "Support Vector Machine Vorhersage für den 01.01.2019"
 output: html_notebook
 ---
-Tobias Lindenau
+Erstellt am 20.01.2020
+Von Tobias Lindenau
 
 ```{r}
-#install packages
-install.packages("e1071")
-
+#install.packages("dataPreparation")
+#install.packages("e1071")
+#install.packages("ISLR")
 # Importing Function Packages
+
+library(dataPreparation)
+
 library(readr)
 library(e1071)
 library(Metrics)
 library(dplyr)
 library(ggplot2)
 
-# Importing Training and Test Data
-house_pricing_test <- read_csv("house_pricing_test.csv")
-house_pricing_train <- read_csv("house_pricing_train.csv")
 ```
 
+Einlesen der Daten
+```{r}
+# master df einlesen
+master_df <- read.csv("master_df.csv")
+
+master_df$Datum <- as.Date(master_df$Datum, format = "%Y-%m-%d")
+
+#X Spalte loeschen
+master_df$X<-NULL
+
+```
+
+Trainings- und Testdatensatz erzeugen. Vorbereitungen
+```{r}
+library(ISLR)
+attach(master_df)
+smp_siz = floor(0.75*nrow(master_df))  # creates a value for dividing the data into train and test. In this case the value is defined as 75% of the number of rows in the dataset
+smp_siz  # shows the value of the sample size
+```
+
+Trainings- und Testdatensatz erzeugen.
+```{r}
+set.seed(123)   # set seed to ensure you always have same random numbers generated
+
+train_ind = sample(seq_len(nrow(master_df)),size = smp_siz)  # Randomly identifies therows equal to sample size ( defined in previous instruction) from  all the rows of master_df dataset and stores the row number in train_ind
+
+train =master_df[train_ind,] #creates the training dataset with row numbers stored in train_ind
+
+test=master_df[-train_ind,]  # creates the test dataset excluding the row numbers mentioned in train_ind
+```
+
+Trainings- und Testdatensatz speichern
+```{r}
+write.csv (train, file = "train.csv")
+write.csv (test, file = "test.csv")
+
+```
+
+2.2 Filter useless variables
+
+The first thing to do, in order to make computation fast, would be to filter useless variables:
+
+    Constant variables
+    Variables that are in double (for example col1 == col2)
+    Variables that are exact bijections (for example col1 = A, B, B, A and col2 = 1, 2, 2, 1)
+
+Let’s id them:
+constant_cols <- whichAreConstant(adult)
+
+# [1] "whichAreConstant: it took me 0s to identify 0 constant column(s)"
+
+double_cols <- whichAreInDouble(adult)
+
+# [1] "whichAreInDouble: it took me 0s to identify 0 column(s) to drop."
+
+bijections_cols <- whichAreBijection(adult)
+
+# [1] "whichAreBijection: education_num is a bijection of education. I put it in drop list."
+# [1] "whichAreBijection: it took me 0.05s to identify 1 column(s) to drop."
+
+#We only found, one bijection: variable education_num which is an index for variable education. Let’s drop it:
+
+X_train$education_num = NULL
+X_test$education_num = NULL
 
 ```{r}
 #################
@@ -27,7 +92,7 @@ house_pricing_train <- read_csv("house_pricing_train.csv")
 
 # Option to check the correctnes of the code with a small (and computationally fast) training data set
 # Do not run or uncomment the following line if you want to reduce the dataset size
-house_pricing_train <- sample_frac(house_pricing_train, .10)
+###house_pricing_train <- sample_frac(house_pricing_train, .10)
 ```
 
 
@@ -42,7 +107,7 @@ house_pricing_train <- sample_frac(house_pricing_train, .10)
 
 # Estimation of various SVM (each with optimized weighting parameters) using systematically varied hyper parameters (typically called 'grid search' approach) and cross validation
 # the resulting object includes the optimal model in the element named 'best.model'
-svm_tune <- tune(svm, price ~ bedrooms + bathrooms + sqft_living + zipcode, data=house_pricing_train, ranges = list(epsilon = seq(0.2,1,0.1), cost = 2^(2:3)))
+svm_tune <- tune(svm, Gesamtumsatz ~ Ware_1 + Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + as.factor(Temperaturklassen), data=master_df, ranges = list(epsilon = seq(0.2,1,0.1), cost = 2^(2:3)))
 
 ```
 
