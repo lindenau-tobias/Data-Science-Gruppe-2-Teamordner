@@ -136,6 +136,8 @@ attr(pred, "probabilities")[1:4,]
 # the resulting object includes the optimal model in the element named 'best.model'
 #Beispiel: svm_tune <- tune(svm, price ~ bedrooms + bathrooms + sqft_living + zipcode, data=house_pricing_train, ranges = list(epsilon = seq(0.2,1,0.1), cost = 2^(2:3)))
 svm_tune <- tune(svm, Gesamtumsatz ~ Ware_1 + Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + as.factor(Temperaturklassen), data=train, ranges = list(epsilon = seq(0.2,1,0.1), cost = 2^(2:3)))
+print(svm_tune)
+summary(svm_tune)
 ```
 
 ```{r}
@@ -154,6 +156,13 @@ mape(train$Gesamtumsatz, pred_train)
 # Calculating the prediction quality for the training data using the MAPE
 mape(test$Gesamtumsatz, pred_test)
 ```
+
+
 ```{r}
 predict()
 ```
+
+```{r}
+
+```
+

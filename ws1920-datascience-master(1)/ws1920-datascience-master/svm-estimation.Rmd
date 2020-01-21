@@ -1,0 +1,73 @@
+---
+title: "Support Vector Machine"
+output: html_notebook
+---
+
+
+```{r}
+# Importing Function Packages
+library(readr)
+library(e1071)
+library(Metrics)
+library(dplyr)
+library(ggplot2)
+
+# Importing Training and Test Data
+house_pricing_test <- read_csv("house_pricing_test.csv")
+house_pricing_train <- read_csv("house_pricing_train.csv")
+```
+
+
+```{r}
+#################
+# Data Preparation
+
+# Option to check the correctnes of the code with a small (and computationally fast) training data set
+# Do not run or uncomment the following line if you want to reduce the dataset size
+house_pricing_train <- sample_frac(house_pricing_train, .10)
+```
+
+
+
+```{r}
+#################
+# Training the SVM
+
+# Estimation of an SVM with optimized weighting parameters and given standard hyper parameters
+# Typically not used; instead, the function svm_tune is used in order to also get a model with optimized hyper parameters
+#model_svm <- svm(price ~ bathrooms, house_pricing_train)
+
+# Estimation of various SVM (each with optimized weighting parameters) using systematically varied hyper parameters (typically called 'grid search' approach) and cross validation
+# the resulting object includes the optimal model in the element named 'best.model'
+svm_tune <- tune(svm, price ~ bedrooms + bathrooms + sqft_living + zipcode, data=house_pricing_train, ranges = list(epsilon = seq(0.2,1,0.1), cost = 2^(2:3)))
+
+```
+
+
+
+```{r}
+#################
+# Checking the prediction Quality
+
+# Calculating the prediction for the training data using the best model according to the grid search
+pred_train <- predict(svm_tune$best.model, house_pricing_train)
+
+# Calculating the prediction for the test data using the best model according to the grid search
+pred_test <- predict(svm_tune$best.model, house_pricing_test)
+
+# Calculating the prediction quality for the training data using the MAPE
+mape(house_pricing_train$price, pred_train)
+
+# Calculating the prediction quality for the training data using the MAPE
+mape(house_pricing_test$price, pred_test)
+```
+
+
+
+
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
