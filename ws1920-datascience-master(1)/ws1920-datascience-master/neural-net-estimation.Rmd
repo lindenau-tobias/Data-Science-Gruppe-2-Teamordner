@@ -8,8 +8,11 @@ output: html_notebook
 # Nur ausführen, beim allerersten Mal !!
 install.packages("fastDummies")
 install.packages("reticulate")
+install.packages("Metrics")
 
 library(reticulate)
+py_install("pandas")
+py_install("numpy")
 py_install("tensorflow")
 
 ```
@@ -124,6 +127,7 @@ test_labels = house_pricing_norm[-train_ind, label]
 ### Schätzung des Neuronalen Netzes
 ```{python}
 # Benoetigte Python Libraries einbinden
+import numpy as np
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
