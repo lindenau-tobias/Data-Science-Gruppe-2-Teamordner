@@ -11,9 +11,20 @@ install.packages("reticulate")
 install.packages("Metrics")
 
 library(reticulate)
-py_install("pandas")
-py_install("numpy")
-py_install("tensorflow")
+
+# Installation von miniconda (falls nicht vorhanden)
+install_miniconda()
+
+# Anlegen einer speziellen Python Umgebung
+conda_create("r-reticulate")
+
+# Installieren der Pakete in der angelegten Umgebung
+conda_install("r-reticulate", "pandas")
+conda_install("r-reticulate", "numpy")
+conda_install("r-reticulate", "tensorflow")
+
+# Definition einer speziellen Python Umgebung die genutzt werden soll
+use_condaenv("r-reticulate")
 
 ```
 
