@@ -146,6 +146,19 @@ rmse_models_test <- rbind(rmse(test$Gesamtumsatz, predict(mod1, newdata = test))
                           rmse(test$Gesamtumsatz, predict(mod2, newdata = test)),
                           rmse(test$Gesamtumsatz, predict(mod3, newdata = test)),
                           rmse(test$Gesamtumsatz, predict(mod7, newdata = test))) # bestes Model mit 240.0464
+
+
+mod1_pred <- predict(mod1, newdata = test)
+mod2_pred <- predict(mod2, newdata = test)
+mod3_pred <- predict(mod3, newdata = test)
+mod7_pred <- predict(mod7, newdata = test)
+
+scatter_input_lm <- validation %>%
+  select(Sales, wochentag) %>%
+  mutate(mod1 = mod1_pred,
+         mod2 = mod2_pred,
+         mod3 = mod3_pred,
+         mod4 = mod4_pred)
 ```
 
 
@@ -176,9 +189,9 @@ pred_train_model_svm <- predict(model_svm, train)
 View(pred_train_model_svm)
 
 # compute decision values and probabilites
-pred_train_model_svm <- predict(model_svm, Gesamtumsatz)
-attr(pred, "decision.values")[1:4,]
-attr(pred, "probabilities")[1:4,]
+#pred_train_model_svm <- predict(model_svm, Gesamtumsatz)
+#attr(pred, "decision.values")[1:4,]
+#attr(pred, "probabilities")[1:4,]
 
 ```
 
@@ -191,17 +204,33 @@ attr(pred, "probabilities")[1:4,]
 #Beispiel: svm_tune <- tune(svm, price ~ bedrooms + bathrooms + sqft_living + zipcode, data=house_pricing_train, ranges = list(epsilon = seq(0.2,1,0.1), cost = 2^(2:3)))
 svm_tune <- tune(svm, Gesamtumsatz ~ Ware_3 + Ware_5 + Ware_6 + as.factor(Wochentag), data=train, ranges = list(epsilon = seq(0.2,1,0.1), cost = 2^(2:3)))
 
-
-
-
 print(svm_tune)
 summary(svm_tune)
 ```
 
+## beobachteten und modellierten Umsatz der SVM_Tune vergleichen ##
 ```{r}
 pred_train <- predict(svm_tune$best.model, newdata = test)
 
 rmse_svm <- rmse(test$Gesamtumsatz, pred_train)
+
+scatter_input <- test %>%
+  select(Gesamtumsatz) %>%
+  mutate(pred_Umsatz = rmse_svm)
+
+scatter_input <- scatter_input %>%
+  mutate(pred_Umsatz = rmse_svm)
+
+ggplot(data = scatter_input, aes(x=Gesamtumsatz, y = pred_Umsatz))+
+  geom_point()+
+  geom_abline(slope = 1, intercept = 0)+
+  scale_x_continuous(limits = c(500, 3050))+
+  scale_y_continuous(limits = c(500, 3050))+
+  labs(title = "Vergleich des beobachteten und des modellierten Umsatzes",
+       caption = "basierend auf dem Testdatensatz") +
+  xlab("Beobachteter Umsatz")+
+  ylab("Vorhergesagter Umsatz")+
+  theme(text = element_text(size = 20))
 
 ```
 
