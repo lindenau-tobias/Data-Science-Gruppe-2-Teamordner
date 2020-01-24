@@ -9,14 +9,20 @@ Von Tobias Lindenau
 #install.packages("dataPreparation")
 #install.packages("e1071")
 #install.packages("ISLR")
+#install.packages("timeDate")
+
 # Importing Function Packages
 
 library(dataPreparation)
 library(readr)
-library(e1071)
-library(Metrics)
 library(dplyr)
+library(lubridate)
+library(broom)
 library(ggplot2)
+library(timeDate)
+library(Metrics)
+library(e1071)
+library(knitr)
 
 ```
 
@@ -32,23 +38,42 @@ master_df$X<-NULL
 
 ```
 
+
+NA Werte in 0 umwandeln
+```{r}
+master_df[is.na(master_df)] <- 0
+```
+
+
 Trainings- und Testdatensatz erzeugen. Vorbereitungen
 ```{r}
-library(ISLR)
+set.seed(123)
+samples <- sample.int(n = nrow(master_df), size = floor(0.8*nrow(master_df)), replace = FALSE)
+train <- master_df[samples, ]
+test <- master_df[-samples,]
+```
+
+
+```{r}
+#library(ISLR)
 #attach(master_df)
-smp_siz = floor(0.75*nrow(master_df))  # creates a value for dividing the data into train and test. In this case the value is defined as 75% of the number of rows in the dataset
-smp_siz  # shows the value of the sample size
+#smp_siz = floor(0.75*nrow(master_df))  # creates a value for dividing the data into train and test. In this case the value is defined as 75% of the number of rows in the dataset
+#smp_siz  # shows the value of the sample size
+
+#samples <- sample.int(n = nrow(master_df), size = floor(0.7*nrow(master_df)), replace = FALSE)
+#train <- master_df[samples, ]
+#validation <- master_df[-samples,]
 ```
 
 Trainings- und Testdatensatz erzeugen.
 ```{r}
-set.seed(123)   # set seed to ensure you always have same random numbers generated
+#set.seed(123)   # set seed to ensure you always have same random numbers generated
 
-train_ind = sample(seq_len(nrow(master_df)),size = smp_siz)  # Randomly identifies therows equal to sample size ( defined in previous instruction) from  all the rows of master_df dataset and stores the row number in train_ind
+#train_ind = sample(seq_len(nrow(master_df)),size = smp_siz)  # Randomly identifies therows equal to sample size ( defined in previous instruction) from  all the rows of master_df dataset and stores the row number in train_ind
 
-train =master_df[train_ind,] #creates the training dataset with row numbers stored in train_ind
+#train =master_df[train_ind,] #creates the training dataset with row numbers stored in train_ind
 
-test=master_df[-train_ind,]  # creates the test dataset excluding the row numbers mentioned in train_ind
+#test=master_df[-train_ind,]  # creates the test dataset excluding the row numbers mentioned in train_ind
 ```
 
 Trainings- und Testdatensatz speichern
@@ -94,6 +119,34 @@ X_test$education_num = NULL
 ###train <- sample_frac(train, .10)
 ```
 
+### Model vorbereiten
+
+```{r}
+mod1 <- lm(Gesamtumsatz ~ Ware_1, train)
+mod2 <- lm(Gesamtumsatz ~ Ware_1 + Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6, train)
+mod3 <- lm(Gesamtumsatz ~ Ware_1 + Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + as.factor(Wochentag), train)
+mod4 <- lm(Gesamtumsatz ~ Ware_1 + Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + as.factor(Wochentag) + as.factor(Wettercode), train)
+mod5 <- lm(Gesamtumsatz ~ Ware_1 + Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + as.factor(Wochentag) + as.factor(Wettercode) + Temperaturklassen, train)
+mod6 <- lm(Gesamtumsatz ~ Ware_1 + Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + as.factor(Wochentag) + as.factor(Wettercode) + Temperaturklassen + nach_feiertag + Ferien + Weihnachtsmarkt, train)
+mod7 <- lm(Gesamtumsatz ~ Ware_3 + Ware_5 + Ware_6 + as.factor(Wochentag), train)
+
+summary(mod3)
+
+model_result <- rbind(glance(mod1), glance(mod2), glance(mod3), glance(mod4), glance(mod5), glance(mod6), glance(mod7))
+
+rmse_models <- rbind(rmse(train$Gesamtumsatz, predict(mod1)),
+                     rmse(train$Gesamtumsatz, predict(mod2)),
+                     rmse(train$Gesamtumsatz, predict(mod3)), #214.3274 bestes Model
+                     rmse(train$Gesamtumsatz, predict(mod4)),
+                     rmse(train$Gesamtumsatz, predict(mod5)),
+                     rmse(train$Gesamtumsatz, predict(mod6)),
+                     rmse(train$Gesamtumsatz, predict(mod7))) 
+
+rmse_models_test <- rbind(rmse(test$Gesamtumsatz, predict(mod1, newdata = test)),
+                          rmse(test$Gesamtumsatz, predict(mod2, newdata = test)),
+                          rmse(test$Gesamtumsatz, predict(mod3, newdata = test)),
+                          rmse(test$Gesamtumsatz, predict(mod7, newdata = test))) # bestes Model mit 240.0464
+```
 
 
 ### model_svm ###
@@ -103,7 +156,7 @@ X_test$education_num = NULL
 
 # Estimation of an SVM with optimized weighting parameters and given standard hyper parameters
 # Typically not used; instead, the function svm_tune is used in order to also get a model with optimized hyper parameters
-model_svm <- svm(Gesamtumsatz ~ Ware_1, train)
+model_svm <- svm(Gesamtumsatz ~ Ware_1 + Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + as.factor(Wochentag), train)
 
 print(model_svm)
 summary(model_svm)
@@ -115,9 +168,10 @@ summary(model_svm)
 #m   <- svm(x, y)
 #new <- predict(m, x)
 
+### Vorhersage Qualität checken ###
 ```{r}
 # test with train data
-pred_train_model_svm <- predict(model_svm, master_df)
+pred_train_model_svm <- predict(model_svm, train)
 
 View(pred_train_model_svm)
 
@@ -135,10 +189,22 @@ attr(pred, "probabilities")[1:4,]
 # Estimation of various SVM (each with optimized weighting parameters) using systematically varied hyper parameters (typically called 'grid search' approach) and cross validation
 # the resulting object includes the optimal model in the element named 'best.model'
 #Beispiel: svm_tune <- tune(svm, price ~ bedrooms + bathrooms + sqft_living + zipcode, data=house_pricing_train, ranges = list(epsilon = seq(0.2,1,0.1), cost = 2^(2:3)))
-svm_tune <- tune(svm, Gesamtumsatz ~ Ware_1 + Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + as.factor(Temperaturklassen), data=train, ranges = list(epsilon = seq(0.2,1,0.1), cost = 2^(2:3)))
+svm_tune <- tune(svm, Gesamtumsatz ~ Ware_3 + Ware_5 + Ware_6 + as.factor(Wochentag), data=train, ranges = list(epsilon = seq(0.2,1,0.1), cost = 2^(2:3)))
+
+
+
+
 print(svm_tune)
 summary(svm_tune)
 ```
+
+```{r}
+pred_train <- predict(svm_tune$best.model, newdata = test)
+
+rmse_svm <- rmse(test$Gesamtumsatz, pred_train)
+
+```
+
 
 ```{r}
 #################

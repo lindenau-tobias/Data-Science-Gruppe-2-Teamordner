@@ -2,7 +2,8 @@
 title: "linearer_model_input"
 output: html_notebook
 ---
-
+Tobias
+überarbeitet am 24.01.2020
 
 #title: "linearer model input
 #Ziel: model mit den master df variablen füttern
@@ -78,7 +79,7 @@ mod4 <- lm(Gesamtumsatz ~ Ware_1+ Ware_2 + Ware_3 + Ware_4 + Ware_5, master_df)
 mod5 <- lm(Gesamtumsatz ~ Ware_1+ Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6, master_df)
 mod6 <- lm(Gesamtumsatz ~ Ware_1 + Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + as.factor(Temperaturklassen), master_df) #76% Testsieger
 #mod6 <- lm(Gesamtumsatz ~ Ware_1+ Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + Wochentag, master_df) #sehr kleine Verbesserung
-mod7 <- lm(Gesamtumsatz ~ Ware_1 + Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + as.factor(Temperaturklassen) + as.factor(Feiertag), master_df) 
+mod7 <- lm(Gesamtumsatz ~ Ware_1 + Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + as.factor(Temperaturklassen), master_df) 
 #mod7 <- lm(Gesamtumsatz ~ Ware_1+ Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + Wochentag + Ferien, master_df) #Sehr kleine Verschlechterung
 
 
@@ -104,7 +105,7 @@ modelle plotten
 ```{r}
 #BEISPIEL
 #lmTemp = lm(Pressure~Temperature, data = pressure) #Create the linear regression
-#plot(pressure, pch = 16, col = "blue") #Plot the results
+plot(Gesamtumsatz, pch = 16, col = "blue") #Plot the results
 #abline(lmTemp) #Add a regression line
 
 #plot(master_df$Gesamtumsatz, pch = 16, col = "blue")
