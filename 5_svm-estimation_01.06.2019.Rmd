@@ -1,14 +1,10 @@
 ---
-title: "Support Vector Machine Vorhersage für den 01.01.2019"
+title: "Support Vector Machine Vorhersage für den 01.06.2019"
 output: html_notebook
 ---
 Erstellt am 20.01.2020
 Von Tobias Lindenau
 
-#```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_chunk$set(fig.width = 15, fig.height = 10)
-```
 
 Pakete installieren
 ```{r}
@@ -58,8 +54,9 @@ NA Werte in 0 umwandeln
 master_df[is.na(master_df)] <- 0
 ```
 
+### Trainings- und Testdatensatz erzeugen ###
 
-Trainings- und Testdatensatz erzeugen. Vorbereitungen
+Trainings- und Testdatensatz erzeugen.
 ```{r}
 set.seed(123)
 samples <- sample.int(n = nrow(master_df), size = floor(0.8*nrow(master_df)), replace = FALSE)
@@ -67,7 +64,7 @@ train <- master_df[samples, ]
 test <- master_df[-samples,]
 ```
 
-
+Etwas abgewandelter Code zum erzeugen von Trainings- und Testdaten
 ```{r}
 #library(ISLR)
 #attach(master_df)
@@ -79,7 +76,7 @@ test <- master_df[-samples,]
 #validation <- master_df[-samples,]
 ```
 
-Trainings- und Testdatensatz erzeugen.
+Noch eine Variante, um Trainings- und Testdatensatz erzeugen.
 ```{r}
 #set.seed(123)   # set seed to ensure you always have same random numbers generated
 
@@ -97,32 +94,6 @@ write.csv (test, file = "test.csv")
 
 ```
 
-2.2 Filter useless variables
-
-The first thing to do, in order to make computation fast, would be to filter useless variables:
-
-    Constant variables
-    Variables that are in double (for example col1 == col2)
-    Variables that are exact bijections (for example col1 = A, B, B, A and col2 = 1, 2, 2, 1)
-
-Let’s id them:
-constant_cols <- whichAreConstant(adult)
-
-# [1] "whichAreConstant: it took me 0s to identify 0 constant column(s)"
-
-double_cols <- whichAreInDouble(adult)
-
-# [1] "whichAreInDouble: it took me 0s to identify 0 column(s) to drop."
-
-bijections_cols <- whichAreBijection(adult)
-
-# [1] "whichAreBijection: education_num is a bijection of education. I put it in drop list."
-# [1] "whichAreBijection: it took me 0.05s to identify 1 column(s) to drop."
-
-#We only found, one bijection: variable education_num which is an index for variable education. Let’s drop it:
-
-X_train$education_num = NULL
-X_test$education_num = NULL
 
 ```{r}
 #################
@@ -133,18 +104,83 @@ X_test$education_num = NULL
 ###train <- sample_frac(train, .10)
 ```
 
-### Model vorbereiten
+### Model vorbereiten ###
 
+# Lineare Regression #
+Einfluss der Variablen je Warengruppe testen #Wettercode rausgenommen, da test und train nicht die selben codes haben
 ```{r}
-mod1 <- lm(Gesamtumsatz ~ Ware_1, train)
+#Ware_1 Umsätze
+mod1 <- lm(Ware_1 ~ as.factor(Wochentag), train)
+mod2 <- lm(Ware_1 ~ as.factor(Wochentag) + Wettercode, train)
+mod3 <- lm(Ware_1 ~ as.factor(Wochentag) + Wettercode + as.factor(Temperaturklassen), train)
+mod4 <- lm(Ware_1 ~ as.factor(Wochentag) + Wettercode + as.factor(Temperaturklassen) + as.factor(nach_feiertag), train)
+mod5 <- lm(Ware_1 ~ as.factor(Wochentag) + Wettercode + as.factor(Temperaturklassen) + as.factor(nach_feiertag) + as.factor(Ferien), train)
+mod6 <- lm(Ware_1 ~ as.factor(Wochentag) + Wettercode + as.factor(Temperaturklassen) + as.factor(nach_feiertag) + as.factor(Ferien) + as.factor(KielerWoche), train)
+mod7 <- lm(Ware_1 ~ as.factor(Wochentag) + Wettercode + as.factor(Temperaturklassen) + as.factor(nach_feiertag) + as.factor(Ferien) + as.factor(KielerWoche) + as.factor(Weihnachtsmarkt), train)
+
+
+model_result <- rbind(glance(mod1), glance(mod2), glance(mod3), glance(mod4), glance(mod5), glance(mod6), glance(mod7))
+
+rmse_models <- rbind(rmse(train$Gesamtumsatz, predict(mod1)),
+                     rmse(train$Gesamtumsatz, predict(mod2)),
+                     rmse(train$Gesamtumsatz, predict(mod3)), 
+                     rmse(train$Gesamtumsatz, predict(mod4)),
+                     rmse(train$Gesamtumsatz, predict(mod5)),
+                     rmse(train$Gesamtumsatz, predict(mod6)),
+                     rmse(train$Gesamtumsatz, predict(mod7))) 
+
+rmse_models_test <- rbind(rmse(test$Gesamtumsatz, predict(mod1, newdata = test)),
+                          rmse(test$Gesamtumsatz, predict(mod2, newdata = test)),
+                          rmse(test$Gesamtumsatz, predict(mod3, newdata = test)),
+                          rmse(test$Gesamtumsatz, predict(mod4, newdata = test)),
+                          rmse(test$Gesamtumsatz, predict(mod5, newdata = test)),
+                          rmse(test$Gesamtumsatz, predict(mod6, newdata = test)),
+                          rmse(test$Gesamtumsatz, predict(mod7, newdata = test))) 
+
+mod1_pred <- predict(mod1, newdata = test)
+mod2_pred <- predict(mod2, newdata = test)
+mod3_pred <- predict(mod3, newdata = test)
+mod4_pred <- predict(mod4, newdata = test)
+mod5_pred <- predict(mod4, newdata = test)
+mod6_pred <- predict(mod4, newdata = test)
+mod7_pred <- predict(mod4, newdata = test)
+
+scatter_input_lm <- test %>%
+  select(Ware_1, Wochentag) %>%
+  mutate(mod1 = mod1_pred,
+         mod2 = mod2_pred,
+         mod3 = mod3_pred,
+         mod4 = mod4_pred,
+         mod5 = mod5_pred,
+         mod6 = mod6_pred,
+         mod7 = mod7_pred)
+
+ggplot(data = scatter_input_lm, aes(x=Ware_1, y=mod1, color = Wochentag))+
+  geom_point()+
+  geom_abline(slope = 1, intercept = 0)+
+  labs(title = "Vergleich beobachteten und modellierten Umsatz",
+       caption = "basierend auf dem test Datensatz") +
+  scale_x_continuous(limits = c(1000, 2000))+
+  scale_y_continuous(limits = c(1000, 2000))+
+  xlab("Beobachteter Umsatz")+
+  ylab("Vorhergesagter Umsatz")+
+  theme(text = element_text(size = 20))
+```
+
+HIER WEITER MACHEN
+```{r}
+
+
+
+
 mod2 <- lm(Gesamtumsatz ~ Ware_1 + Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6, train)
 mod3 <- lm(Gesamtumsatz ~ Ware_1 + Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + as.factor(Wochentag), train)
 mod4 <- lm(Gesamtumsatz ~ Ware_1 + Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + as.factor(Wochentag) + as.factor(Wettercode), train)
-mod5 <- lm(Gesamtumsatz ~ Ware_1 + Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + as.factor(Wochentag) + as.factor(Wettercode) + Temperaturklassen, train)
-mod6 <- lm(Gesamtumsatz ~ Ware_1 + Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + as.factor(Wochentag) + as.factor(Wettercode) + Temperaturklassen + nach_feiertag + Ferien + Weihnachtsmarkt, train)
-mod7 <- lm(Gesamtumsatz ~ Ware_3 + Ware_5 + Ware_6 + as.factor(Wochentag), train)
+mod5 <- lm(Gesamtumsatz ~ Ware_1 + Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + as.factor(Wochentag) + as.factor(Wettercode) + as.factor(Temperaturklassen), train)
+mod6 <- lm(Gesamtumsatz ~ Ware_1 + Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + as.factor(Wochentag) + as.factor(Temperaturklassen) + as.factor(nach_feiertag) + as.factor(Ferien), train)
+mod7 <- lm(Gesamtumsatz ~ as.factor(Wochentag), train)
 
-summary(mod3)
+summary(mod6)
 
 model_result <- rbind(glance(mod1), glance(mod2), glance(mod3), glance(mod4), glance(mod5), glance(mod6), glance(mod7))
 
@@ -222,6 +258,16 @@ print(svm_tune)
 summary(svm_tune)
 ```
 
+```{r}
+# find the best parameters
+summary(tune.out)$best.parameters
+
+# the best model
+best_model = tune.out$best.model
+
+```
+
+
 ## beobachteten und modellierten Umsatz der SVM_Tune vergleichen ##
 ```{r}
 pred_train <- predict(svm_tune$best.model, newdata = test)
@@ -265,5 +311,3 @@ mape(train$Gesamtumsatz, pred_train)
 # Calculating the prediction quality for the training data using the MAPE
 mape(test$Gesamtumsatz, pred_test)
 ```
-
-
