@@ -9,6 +9,7 @@ Tobias
 #Ziel: model mit den master df variablen füttern
 #Autor: "Tobias Lindenau"
 #Datum des Erstellens: 18.01.2020
+#Aenderungen von Tobias
 
 
 ```{r}
@@ -39,10 +40,7 @@ master_df$X<-NULL
 
 ```
 
-Ja oder Nein Variablen als as.factor setzten
-```{r}
-
-
+Ja oder Nein Variablen als as.factor setzten #nicht nötig
 master_df$Monat<-as.factor(master_df$Monat)
 master_df$Weihnachtsmarkt<-as.factor(master_df$Weihnachtsmarkt)
 master_df$Ferien<-as.factor(master_df$Ferien)
@@ -53,24 +51,42 @@ master_df$Temperaturklassen<-as.factor(master_df$Temperaturklassen)
 master_df$nach_feiertag<-as.factor(master_df$nach_feiertag)
 master_df$vor_feiertag<-as.factor(master_df$vor_feiertag)
 
+```{r}
+
+
+
+
 ```
 
-Kiwo as double
-```{r}
+Kiwo as double # nicht nötig
 master_df$KielerWoche<-as.double(master_df$KielerWoche)
+```{r}
+
 ```
+
+Temperaturklassen neu berechnen, da diese NA Werte enthalten
+```{r}
+# Klasseneinteilung in kalt (Temp<10), normla (Temp10-20) und warm (Temp>20)
+master_df$Temperaturklassen <- "kalt"
+master_df$Temperaturklassen[master_df$Temperatur > 10 & master_df$Temperatur < 20] <- "normal"
+master_df$Temperaturklassen[master_df$Temperatur > 20] <- "warm"
+
+```
+
 
 Na Value mit 0 ersetzten
 ```{r}
-master_df <- master_df %>%
-    mutate(KielerWoche = if_else(is.na(KielerWoche), 0, KielerWoche))
+#master_df <- master_df %>%
+#    mutate(KielerWoche = if_else(is.na(KielerWoche), 0, KielerWoche))
+
+#NA Werte durch 0 ersetzen. 
+master_df[is.na(master_df)] <- 0
 
 #von Merle eingefügt, damit alle NAs mit 0 ersetzt werden  klappte gerstern aber nicht heute
 #master_df[is.na(master_df)] <- 0 
 ```
 
-
-Modellgleichung
+Modellgleichung NEU
 ```{r}
 mod1 <- lm(Gesamtumsatz ~ Ware_1, master_df)
 mod2 <- lm(Gesamtumsatz ~ Ware_1+ Ware_2 + Ware_3, master_df)
@@ -83,13 +99,36 @@ mod7 <- lm(Gesamtumsatz ~ Ware_1 + Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + 
 #mod7 <- lm(Gesamtumsatz ~ Ware_1+ Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + Wochentag + Ferien, master_df) #Sehr kleine Verschlechterung
 
 
+summary(mod1)
+
+
+
+```
+
+Modellgleichung 
+
+```{r}
+#sobald die Warengruppen mit einbezogen werden, steigt der adj r squared auf 99 oder 100
+#
+mod1 <- lm(Gesamtumsatz ~ Ware_2, master_df)
+mod2 <- lm(Gesamtumsatz ~ Ware_1 + Ware_2 + Ware_3, master_df)
+mod3 <- lm(Gesamtumsatz ~ Ware_2, master_df)
+mod4 <- lm(Gesamtumsatz ~ Ware_1 + Ware_2 + Ware_3 + Ware_4 + Ware_5, master_df)
+mod5 <- lm(Gesamtumsatz ~ Ware_1 + Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6, master_df)
+mod6 <- lm(Gesamtumsatz ~ Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + as.factor(Temperaturklassen) + as.factor(vor_feiertag) + as.factor(Feiertag) + as.factor(Wochentag), master_df) 
+#mod6 <- lm(Gesamtumsatz ~ Ware_1+ Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + Wochentag, master_df) #sehr kleine Verbesserung
+mod7 <- lm(Gesamtumsatz ~ Ware_2 + as.factor(Temperaturklassen) + as.factor(vor_feiertag) + as.factor(Feiertag) + as.factor(Wochentag), master_df)
+#mod7 <- lm(Gesamtumsatz ~ Ware_1+ Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + Wochentag + Ferien, master_df) #Sehr kleine Verschlechterung
+
+
 summary(mod7)
 
 
 
 ```
+
 ```{r}
-modx <- lm(Gesamtumsatz ~ as.factor(Feiertag) + Ware_2 + Ware_5 + Ware_6, master_df)
+modx <- lm(Gesamtumsatz ~ as.factor(Wochentag) + as.factor(KielerWoche) + Ware_1 + Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6, master_df)
 summary(modx)
 ```
 
@@ -103,18 +142,13 @@ rbind(glance(mod1), glance(mod2), glance(mod3), glance(mod4), glance(mod5), glan
 
 modelle plotten
 ```{r}
+
+
 #BEISPIEL
 #lmTemp = lm(Pressure~Temperature, data = pressure) #Create the linear regression
-plot(Gesamtumsatz, pch = 16, col = "blue") #Plot the results
-#abline(lmTemp) #Add a regression line
+plot1<-plot(Gesamtumsatz, pch = 16, col = "blue") #Plot the results
+abline(lmTemp) #Add a regression line
 
 #plot(master_df$Gesamtumsatz, pch = 16, col = "blue")
 #abline(mod6)
 ```
-
-
-```{r}
-mod1 <- lm(Gesamtumsatz ~ Wochentag + Sonntag + Samstag + Monat + Weihnachtsmarkt + Ferien + Monat + Ware_1 + Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + weihnachtsfeiertag_25 + weihnachtsfeiertag_26 + weihnachtsfeiertag_27 + neujahrstage + KielerWoche, master_df)
-summary(mod1)
-```
-

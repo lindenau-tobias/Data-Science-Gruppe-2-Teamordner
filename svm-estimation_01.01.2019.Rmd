@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(fig.width = 15, fig.height = 10)
 ```
 
+Pakete installieren
 ```{r}
 #install.packages("dataPreparation")
 #install.packages("e1071")

@@ -11,6 +11,8 @@ output: html_notebook
 
 #stark geändert von Merle am 20.01.2020 (falls was nicht mehr klappt)
 
+#Weitere Änderungen von Tobias. Grund: Der Fehler mit den fehlenden Umsätzen zur KiWo kommt zustande, da beim Berechnen des Gesamtumsatzes etwas falsch läuft. An Tagen an denen Ware_6 null ist ist der Gesamtumsatz auch null, obwohl andere Warengruppen Umsatz gemacht haben. Den Programmcode kann ich allerdings nicht finden.Den hat Katha vermutlich vergessen zu teilen. NA Werte durch 0 ersetzt und Gesamtzumsatz neu berechnet. Hat geklappt.
+
 ```{r}
 #Bibliotheken
 library(readr)
@@ -79,6 +81,16 @@ nach_feiertag$X1<-NULL
 ```
 
 
+Korrekturen des df besonderes_weihnachtsfeiertage_neujahr
+```{r}
+#NA Werte durch 0 ersetzen. Multiplikationen mit NA Werten sonst nicht möglich.
+besonderes_weihnachtsfeiertage_neujahr[is.na(besonderes_weihnachtsfeiertage_neujahr)] <- 0
+
+#neu Berechnen
+besonderes_weihnachtsfeiertage_neujahr <- besonderes_weihnachtsfeiertage_neujahr %>%
+  mutate(Gesamtumsatz = Ware_1 + Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6)#Gesamtumsatz neu berechnen
+besonderes_weihnachtsfeiertage_neujahr
+```
 
 
 

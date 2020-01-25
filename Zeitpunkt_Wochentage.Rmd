@@ -116,8 +116,8 @@ für weitere Analyse müssen erst die ganzen Feiertage etc. rausgenommen werden
 
 #einlesen der Variable mit den Feiertagen
 
-Feiertage <- read_delim("Variablen.csv",         #bisher nur für das Jahr 2013 (Stand 09.12)
-    ";", escape_double = FALSE, trim_ws = TRUE)
+#Feiertage <- read_delim("Variablen.csv",         #bisher nur für das Jahr 2013 (Stand 09.12)
+#    ";", escape_double = FALSE, trim_ws = TRUE)
 
 #Warengruppe 6 rausnehmen und alle Werte von Warengruppe 5 über 1000 Euro (Ergebnis einer anderen Analyse zeigte, dass Warengruppe 5 nur an ganz singulären Tagen so einen großen Umsatz macht, deswegen verfälscht es evtl. das Ergebnis)
 
