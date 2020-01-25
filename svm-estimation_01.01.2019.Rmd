@@ -5,7 +5,7 @@ output: html_notebook
 Erstellt am 20.01.2020
 Von Tobias Lindenau
 
-```{r setup, include=FALSE}
+#```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(fig.width = 15, fig.height = 10)
 ```
@@ -44,6 +44,14 @@ master_df$X<-NULL
 
 ```
 
+Temperaturklassen neu berechnen, da diese NA Werte enthalten
+```{r}
+# Klasseneinteilung in kalt (Temp<10), normla (Temp10-20) und warm (Temp>20)
+master_df$Temperaturklassen <- "kalt"
+master_df$Temperaturklassen[master_df$Temperatur > 10 & master_df$Temperatur < 20] <- "normal"
+master_df$Temperaturklassen[master_df$Temperatur > 20] <- "warm"
+
+```
 
 NA Werte in 0 umwandeln
 ```{r}
@@ -237,7 +245,7 @@ ggplot(data = scatter_input, aes(x=Gesamtumsatz, y = pred_Umsatz))+
   xlab("Beobachteter Umsatz")+
   ylab("Vorhergesagter Umsatz")+
   theme(text = element_text(size = 20))
-
+#Vermutlich overfitting
 ```
 
 
@@ -258,12 +266,4 @@ mape(train$Gesamtumsatz, pred_train)
 mape(test$Gesamtumsatz, pred_test)
 ```
 
-
-```{r}
-predict()
-```
-
-```{r}
-
-```
 
