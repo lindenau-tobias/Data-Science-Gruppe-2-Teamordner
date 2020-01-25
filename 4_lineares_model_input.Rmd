@@ -14,6 +14,7 @@ Tobias
 
 ```{r}
 #install.packages("Metrics")
+#install.packages("hrbrthemes")
 #Bibliotheken
 library(readr)
 library(tidyverse)
@@ -23,6 +24,7 @@ library(dplyr)
 library(magrittr)
 library(broom)
 library(Metrics)
+library(hrbrthemes)
 
 ```
 
@@ -127,11 +129,6 @@ summary(mod7)
 
 ```
 
-```{r}
-modx <- lm(Gesamtumsatz ~ as.factor(Wochentag) + as.factor(KielerWoche) + Ware_1 + Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6, master_df)
-summary(modx)
-```
-
 
 ```{r}
 # Preparation of Model Results
@@ -142,12 +139,17 @@ rbind(glance(mod1), glance(mod2), glance(mod3), glance(mod4), glance(mod5), glan
 
 modelle plotten
 ```{r}
+# with linear trend
+p2 <- ggplot(master_df, aes(x=Gesamtumsatz, y=Datum)) +
+  geom_point() +
+  geom_smooth(method=lm , color="red", se=FALSE) +
+  theme_ipsum()
+
+#abline(mod7) #Add a regression line
+
+view(p2)
 
 
-#BEISPIEL
-#lmTemp = lm(Pressure~Temperature, data = pressure) #Create the linear regression
-plot1<-plot(Gesamtumsatz, pch = 16, col = "blue") #Plot the results
-abline(lmTemp) #Add a regression line
 
 #plot(master_df$Gesamtumsatz, pch = 16, col = "blue")
 #abline(mod6)
