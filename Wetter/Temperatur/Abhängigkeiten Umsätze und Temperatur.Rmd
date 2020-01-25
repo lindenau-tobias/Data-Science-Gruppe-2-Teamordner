@@ -63,13 +63,22 @@ ggplot(merge_um_wet, aes(x=Temperatur, y=Umsatz)) +
   geom_smooth(method=lm , color="red", fill="#69b3a2", se=TRUE) +
   theme_ipsum()
 
-hist(merge_um_wet$Temperatur,  main="" , breaks=30 , col=rgb(0.3,0.5,1,0.4) , xlab="Temperatur" , ylab="Anzahl der Tage")
+tage_temp<- hist(merge_um_wet$Temperatur,  main="" , breaks=30 , col=rgb(0.3,0.5,1,0.4) , xlab="Temperatur" , ylab="Anzahl der Tage")
+
+
 
 hist(merge_um_wet$Umsatz,  main="" , breaks=30 , col=rgb(0.3,0.5,1,0.4) , xlab="Umsatz" , ylab="Anzahl der Tage")
 
 plot(merge_um_wet$Umsatz , merge_um_wet$Temperatur,  main="" , pch=20 , cex=0.4 , col=rgb(0.3,0.5,1,0.4)  , xlab="Umsatz" , ylab="Temperatur" )
 
 plot(merge_um_wet$Temperatur , merge_um_wet$Umsatz,  main="" , pch=20 , cex=0.4 , col=rgb(0.3,0.5,1,0.4)  , xlab="Temperatur" , ylab="Umsatz" )
+
+
+
+#histogram im Gruppenordner abspeichern
+png('Anzahl_Tage_Temp.png')
+plot(tage_temp)
+dev.off()
 ```
 
 6. Balkendiagramme des Umsatzes in Abhängigkeit zur Temperatur je Warengruppe

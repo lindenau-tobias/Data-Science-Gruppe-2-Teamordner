@@ -5,6 +5,11 @@ output: html_notebook
 Erstellt am 20.01.2020
 Von Tobias Lindenau
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(fig.width = 15, fig.height = 10)
+```
+
 ```{r}
 #install.packages("dataPreparation")
 #install.packages("e1071")
