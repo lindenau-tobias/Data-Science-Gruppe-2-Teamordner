@@ -139,3 +139,45 @@ ggplot(grafik_feiertag) +
 
 
 ```
+
+
+
+
+
+#Bild mit Koinfidenzintervallen nach den Temperaturklassen erstellen
+
+```{r}
+
+#Datensatz auf die interessanten Variablen herunterbrechen 
+temperatur<-select(master_df, Datum, Temperaturklassen )
+
+#einen left_join machen, um die beiden df`s zusammenzufügen 
+temperatur<-left_join(umsatz, temperatur, by= "Datum")
+
+#Tabelle für den Umsatz nach Warengruppen  und Temperaturklassen
+
+
+grafik_temperatur<- temperatur%>%
+  group_by(Temperaturklassen, Warengruppe) %>%
+  summarise(
+    n=n(), #ist praktisch, weil es die Anzahl z?hlt
+    mean=mean(Umsatz),
+    sd=sd(Umsatz),
+    summe=sum(Umsatz)) %>%
+  mutate( se=sd/sqrt(n))  %>%
+  mutate( ic=se * qt((1-0.05)/2 + .5, n-1))
+
+#alle NAs rausschmeißen
+grafik_temperatur<-na.omit(grafik_temperatur)
+
+
+#Bild mit Koinfidenzintervall
+# Confidence Interval
+ggplot(grafik_temperatur) +
+  geom_bar( aes(x=Temperaturklassen, y=mean), stat="identity", fill="forestgreen", alpha=0.5) +
+  geom_errorbar( aes(x=Temperaturklassen, ymin=mean-ic, ymax=mean+ic), width=0.4, colour="orange", alpha=0.9, size=1.5) +
+   ylab("Durchschnitt (€)")+
+  xlab("Temperaturklasse")+
+  facet_wrap(~Warengruppe)+
+  ggtitle("Umsätze an Tagen mit kalter, normaler oder warmer Temperatur")
+```
