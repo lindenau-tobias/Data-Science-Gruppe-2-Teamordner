@@ -94,7 +94,7 @@ write.csv (test, file = "test.csv")
 
 ```
 
-
+Möglichkeit den Datensatz auf seine Plausibilität zu checken
 ```{r}
 #################
 # Data Preparation
@@ -104,20 +104,25 @@ write.csv (test, file = "test.csv")
 ###train <- sample_frac(train, .10)
 ```
 
+
+
 ### Model vorbereiten ###
 
-# Lineare Regression #
-Einfluss der Variablen je Warengruppe testen #Wettercode rausgenommen, da test und train nicht die selben codes haben
+## Lineare Regression ##
+Einfluss der Variablen je Warengruppe testen              #Wettercode rausgenommen, da test und train nicht die selben codes haben
+
+# Ware_1 #
 ```{r}
 #Ware_1 Umsätze
 mod1 <- lm(Ware_1 ~ as.factor(Wochentag), train)
-mod2 <- lm(Ware_1 ~ as.factor(Wochentag) + Wettercode, train)
-mod3 <- lm(Ware_1 ~ as.factor(Wochentag) + Wettercode + as.factor(Temperaturklassen), train)
-mod4 <- lm(Ware_1 ~ as.factor(Wochentag) + Wettercode + as.factor(Temperaturklassen) + as.factor(nach_feiertag), train)
-mod5 <- lm(Ware_1 ~ as.factor(Wochentag) + Wettercode + as.factor(Temperaturklassen) + as.factor(nach_feiertag) + as.factor(Ferien), train)
-mod6 <- lm(Ware_1 ~ as.factor(Wochentag) + Wettercode + as.factor(Temperaturklassen) + as.factor(nach_feiertag) + as.factor(Ferien) + as.factor(KielerWoche), train)
-mod7 <- lm(Ware_1 ~ as.factor(Wochentag) + Wettercode + as.factor(Temperaturklassen) + as.factor(nach_feiertag) + as.factor(Ferien) + as.factor(KielerWoche) + as.factor(Weihnachtsmarkt), train)
+mod2 <- lm(Ware_1 ~ as.factor(Wochentag) + as.factor(Wettercode), train)
+mod3 <- lm(Ware_1 ~ as.factor(Wochentag) + as.factor(Temperaturklassen), train)
+mod4 <- lm(Ware_1 ~ as.factor(Wochentag) + as.factor(Temperaturklassen) + as.factor(nach_feiertag), train)
+mod5 <- lm(Ware_1 ~ as.factor(Wochentag) + as.factor(Temperaturklassen) + as.factor(Ferien), train)
+mod6 <- lm(Ware_1 ~ as.factor(Wochentag) + as.factor(Temperaturklassen) + as.factor(Ferien) + as.factor(KielerWoche), train)
+mod7 <- lm(Ware_1 ~ as.factor(Wochentag) + as.factor(Temperaturklassen) + as.factor(Ferien) + as.factor(KielerWoche) + as.factor(Weihnachtsmarkt), train)
 
+summary(mod4)
 
 model_result <- rbind(glance(mod1), glance(mod2), glance(mod3), glance(mod4), glance(mod5), glance(mod6), glance(mod7))
 
