@@ -4,40 +4,19 @@ output: html_notebook
 author: C. Aurich
 ---
 
-### # Installation ggf. noch benötigter Pakete ###
-```{r}
-# Nur ausführen, beim allerersten Mal !!
-install.packages("fastDummies")
-install.packages("reticulate")
-install.packages("Metrics")
-library(reticulate)
-py_install("pandas")
-py_install("numpy")
-py_install("tensorflow")
-```
-
-
 ### Vorbereitung der Umgebung ###
 ```{r}
 # Umgebungsvariablen löschen
 remove(list = ls())
-# Einbinden benötogter Funktionsbibliotheken
+# Einbinden benötigter Funktionsbibliotheken
 library(reticulate)
 library(readr)
 library(fastDummies)
 library(ggplot2)
 library(Metrics)
-# Funktionsdefinitionen
-#' Title Fast creation of normalized variables
-#' Quickly create normalized columns from numeric type columns in the inputted data. This function is useful for statistical analysis when you want normalized columns rather than the actual columns.
-#'
-#' @param .data An object with the data set you want to make normalized columns from.
-#' @param norm_values Dataframe of column names, means, and standard deviations that is used to create corresponding normalized variables from.
-#'
-#' @return A data.frame (or tibble or data.table, depending on input data type) with same number of rows as inputted data and original columns plus the newly created normalized. columns.
-#' @export
-#'
-#' @examples
+
+# Funktionsdefinitionen zur späteren Produktion standartisierter Werte
+# (übernommen aus dem Data-Science-Kurs-Skript vom 21.01.2020)
 norm_cols <- function (.data, norm_values = NULL) {
   for (i in 1:nrow(norm_values)  ) {
     .data$norm <- (.data[[norm_values$name[i]]] - norm_values$mean[i]) / norm_values$sd[i]
@@ -45,16 +24,9 @@ norm_cols <- function (.data, norm_values = NULL) {
   }
   return (.data)
 }
+
 #' Title Creation of a Dataframe including the Information to Standardize Variables
 #' This function is meant to be used in combination with the function norm_cols
-#'
-#' @param .data A data set including the variables you want to get the means and standard deviations from.
-#' @param select_columns A vector with a list of variable names for which you want to get the means and standard deviations from.
-#'
-#' @return A data.frame (or tibble or data.table, depending on input data type) including the names, means, and standard deviations of the variables included in the select_columns argument.
-#' @export
-#'
-#' @examples
 get.norm_values <- function (.data, select_columns = NULL) {
   result <- NULL
   for (col_name in select_columns) {
@@ -69,11 +41,15 @@ get.norm_values <- function (.data, select_columns = NULL) {
 }
 ```
 
-
 ### Aufbereitung der Daten ###
 ```{r}
-# Einlesen der Daten
-house_pricing <- read_csv("https://raw.githubusercontent.com/opencampus-sh/ws1920-datascience/master/house_pricing_test.csv")
+# Einlesen der Trainingsdaten
+training_df <- read_csv("train.csv")
+# Anpassen der Datenformate
+training_df$Datum <- as.Date(training_df$Datum, format = "%Y-%m-%d")
+training_df$Temperaturklassen <- as.factor(training_df$Temperaturklassen)
+#X1 Spalte loeschen
+training_df$X1<-NULL
 ```
 
 ```{r}
