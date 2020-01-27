@@ -114,41 +114,41 @@ Einfluss der Variablen je Warengruppe testen              #Wettercode rausgenomm
 # Ware_1 #
 ```{r}
 #Ware_1 Umsätze
-mod1 <- lm(Ware_1 ~ as.factor(Wochentag), train)
-mod2 <- lm(Ware_1 ~ as.factor(Wochentag) + as.factor(Wettercode), train)
-mod3 <- lm(Ware_1 ~ as.factor(Wochentag) + as.factor(Temperaturklassen), train)
-mod4 <- lm(Ware_1 ~ as.factor(Wochentag) + as.factor(Temperaturklassen) + as.factor(nach_feiertag), train)
-mod5 <- lm(Ware_1 ~ as.factor(Wochentag) + as.factor(Temperaturklassen) + as.factor(Ferien), train)
-mod6 <- lm(Ware_1 ~ as.factor(Wochentag) + as.factor(Temperaturklassen) + as.factor(Ferien) + as.factor(KielerWoche), train)
-mod7 <- lm(Ware_1 ~ as.factor(Wochentag) + as.factor(Temperaturklassen) + as.factor(Ferien) + as.factor(KielerWoche) + as.factor(Weihnachtsmarkt), train)
+mod1 <- lm(Ware_2 ~ as.factor(Wochentag), train)
+mod2 <- lm(Ware_2 ~ as.factor(Wochentag), train)
+mod3 <- lm(Ware_2 ~ as.factor(Wochentag) + as.factor(Temperaturklassen), train)
+mod4 <- lm(Ware_2 ~ as.factor(Wochentag) + as.factor(Temperaturklassen) + as.factor(nach_feiertag) + as.factor(vor_feiertag), train)
+mod5 <- lm(Ware_2 ~ as.factor(Wochentag) + as.factor(Temperaturklassen) + as.factor(Ferien) + as.factor(vor_feiertag), train)
+mod6 <- lm(Ware_2 ~ as.factor(Wochentag) + as.factor(Temperaturklassen) + as.factor(Ferien) + as.factor(vor_feiertag) + as.factor(KielerWoche), train)
+mod7 <- lm(Ware_2 ~ as.factor(Wochentag) + as.factor(Temperaturklassen) + as.factor(Ferien) + as.factor(vor_feiertag) + as.factor(Monat), train)
 
-summary(mod4)
+summary(mod7)
 
 model_result <- rbind(glance(mod1), glance(mod2), glance(mod3), glance(mod4), glance(mod5), glance(mod6), glance(mod7))
 
-rmse_models <- rbind(rmse(train$Gesamtumsatz, predict(mod1)),
-                     rmse(train$Gesamtumsatz, predict(mod2)),
-                     rmse(train$Gesamtumsatz, predict(mod3)), 
-                     rmse(train$Gesamtumsatz, predict(mod4)),
-                     rmse(train$Gesamtumsatz, predict(mod5)),
-                     rmse(train$Gesamtumsatz, predict(mod6)),
-                     rmse(train$Gesamtumsatz, predict(mod7))) 
+rmse_models <- rbind(rmse(train$Ware_2, predict(mod1)),
+                     rmse(train$Ware_2, predict(mod2)),
+                     rmse(train$Ware_2, predict(mod3)), 
+                     rmse(train$Ware_2, predict(mod4)),
+                     rmse(train$Ware_2, predict(mod5)),
+                     rmse(train$Ware_2, predict(mod6)),
+                     rmse(train$Ware_2, predict(mod7))) 
 
-rmse_models_test <- rbind(rmse(test$Gesamtumsatz, predict(mod1, newdata = test)),
-                          rmse(test$Gesamtumsatz, predict(mod2, newdata = test)),
-                          rmse(test$Gesamtumsatz, predict(mod3, newdata = test)),
-                          rmse(test$Gesamtumsatz, predict(mod4, newdata = test)),
-                          rmse(test$Gesamtumsatz, predict(mod5, newdata = test)),
-                          rmse(test$Gesamtumsatz, predict(mod6, newdata = test)),
-                          rmse(test$Gesamtumsatz, predict(mod7, newdata = test))) 
+rmse_models_test <- rbind(rmse(test$Ware_2, predict(mod1, newdata = test)),
+                          rmse(test$Ware_2, predict(mod2, newdata = test)),
+                          rmse(test$Ware_2, predict(mod3, newdata = test)),
+                          rmse(test$Ware_2, predict(mod4, newdata = test)),
+                          rmse(test$Ware_2, predict(mod5, newdata = test)),
+                          rmse(test$Ware_2, predict(mod6, newdata = test)),
+                          rmse(test$Ware_2, predict(mod7, newdata = test))) 
 
 mod1_pred <- predict(mod1, newdata = test)
 mod2_pred <- predict(mod2, newdata = test)
 mod3_pred <- predict(mod3, newdata = test)
 mod4_pred <- predict(mod4, newdata = test)
-mod5_pred <- predict(mod4, newdata = test)
-mod6_pred <- predict(mod4, newdata = test)
-mod7_pred <- predict(mod4, newdata = test)
+mod5_pred <- predict(mod5, newdata = test)
+mod6_pred <- predict(mod6, newdata = test)
+mod7_pred <- predict(mod7, newdata = test)
 
 scatter_input_lm <- test %>%
   select(Ware_1, Wochentag) %>%
