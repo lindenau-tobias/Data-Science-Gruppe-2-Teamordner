@@ -47,7 +47,7 @@ get.norm_values <- function (.data, select_columns = NULL) {
 training_df <- read_csv("train.csv")
 # Anpassen der Datenformate
 training_df$Datum <- as.Date(training_df$Datum, format = "%Y-%m-%d")
-training_df$Temperaturklassen <- as.factor(training_df$Temperaturklassen)
+#training_df$Temperaturklassen <- as.factor(training_df$Temperaturklassen)
 #X1 Spalte loeschen
 training_df$X1<-NULL
 ```
@@ -56,24 +56,32 @@ training_df$X1<-NULL
 ```{r}
 # Rekodierung von kategoriellen Variablen (zu Dummy-Variablen)
 dummy_list <- c("Wochentag", "Monat", "Temperaturklassen")
-training_df_dummies = dummy_cols(training_df, dummy_list)
-#Speichern der Trainingsdaten mit dummies
+training_df_dummies <- dummy_cols(training_df, dummy_list)
+# Entfernen an dieser Stelle nicht weiter benötigter Spalten
+training_df_dummies$Wochentag<-NULL
+training_df_dummies$Monat<-NULL
+training_df_dummies$Temperaturklassen<-NULL
+training_df_dummies$X1<-NULL
+
+#Speichern der rekodierten Dummytrainingsdaten
 write_csv(training_df_dummies, "training_df_dummies.csv")
+
 # Standardisierung von metrischen Variablen
-norm_list <- c("price", "sqft_lot", "bathrooms", "grade", "condition")
+norm_list <- c("Wochentag", "Monat", "Temperaturklassen")
 # Berechnung der Mittelwerte und Standardabweichungen der zu standardisierenden Variablen
-norm_values_list <- get.norm_values(house_pricing_dummy, norm_list)
+norm_values_list <- get.norm_values(training_df_dummies, norm_list)
 # Standardisierung der angegebenen metrischen Variablen
-house_pricing_norm <- norm_cols(house_pricing_dummy, norm_values_list)
+training_df_norm <- norm_cols(training_df_dummies, norm_values_list)
 # Definition von Variablenlisten, um das Arbeiten mit diesen zu erleichtern
-waterfront_dummies = c('waterfront_0', 'waterfront_1')
-view_dummies = c('view_0', 'view_1', 'view_2', 'view_3','view_4')
+Wochentag_dummies = c('Wochentag_1', 'Wochentag_2', 'Wochentag_3', 'Wochentag_4', 'Wochentag_5', 'Wochentag_6', 'Wochentag_7')
+Monat_dummies = c('Monat_1', 'Monat_2', 'Monat_3', 'Monat_4', 'Monat_5', 'Monat_6', 'Monat_7', 'Monat_8', 'Monat_9', 'Monat_10', 'Monat_11', 'Monat_12')
+Temperaturklassen_dummies = c('Temperaturklassen_kalt', 'Temperaturklassen_normal', 'Temperaturklassen_warm')
 # Definition der Features (der unabhängigen Variablen auf deren Basis die Vorhersagen erzeugt werden sollen)
 features = c('sqft_lot_norm', 'condition_norm', 'grade_norm', 'bathrooms_norm', view_dummies, waterfront_dummies)
 # Definition der Label-Variable (der abhaengigen Variable, die vorhergesagt werden soll) sowie
 label = 'price_norm'
 # Zufallszähler setzen, um die zufällige Partitionierung bei jedem Durchlauf gleich zu halten
-set.seed(1)
+set.seed(42)
 # Bestimmung der Indizes des Traininsdatensatzes
 train_ind <- sample(seq_len(nrow(house_pricing_norm)), size = floor(0.80 * nrow(house_pricing_norm)))
 # Teilen in Trainings- und Testdatensatz
@@ -125,7 +133,7 @@ from tensorflow import keras
 from tensorflow.keras import layers
 # Definition der Form des tiefen neuronalen Netzes (Deep Neural Nets)
 model = keras.Sequential([
-  layers.Dense(5, activation='relu', input_shape=[len(r.train_dataset.keys())]),
+  layers.Dense(5, activation='relu', input_shape=[len(r.training_df_dummies.keys())]),
   layers.Dense(4, activation='relu'),
   layers.Dense(1)
 ])
@@ -135,7 +143,7 @@ model.compile(loss="mse",
 # Ausgabe einer Zusammenfassung zur Form des Modells, das geschaetzt wird (nicht notwendig)
 model.summary()
 # Schaetzung des Modells
-history = model.fit(r.train_dataset, r.train_labels, epochs=150, validation_split = 0.1, verbose=0)
+history = model.fit(r.train_dataset, r.train_labels, epochs=2, validation_split = 0.1, verbose=0)
 ```
 
 
@@ -166,7 +174,6 @@ ggplot(data[-1,]) +
 ```{python}
 model = keras.models.load_model("python_model_best.h5")
 ```
-
 
 ### Auswertung der Schätzergebnisse ###
 ```{r}
