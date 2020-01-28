@@ -52,6 +52,40 @@ training_df$Temperaturklassen <- as.factor(training_df$Temperaturklassen)
 training_df$X1<-NULL
 ```
 
+
+```{r}
+# Rekodierung von kategoriellen Variablen (zu Dummy-Variablen)
+dummy_list <- c("Wochentag", "Monat", "Temperaturklassen")
+training_df_dummies = dummy_cols(training_df, dummy_list)
+#Speichern der Trainingsdaten mit dummies
+write_csv(training_df_dummies, "training_df_dummies.csv")
+# Standardisierung von metrischen Variablen
+norm_list <- c("price", "sqft_lot", "bathrooms", "grade", "condition")
+# Berechnung der Mittelwerte und Standardabweichungen der zu standardisierenden Variablen
+norm_values_list <- get.norm_values(house_pricing_dummy, norm_list)
+# Standardisierung der angegebenen metrischen Variablen
+house_pricing_norm <- norm_cols(house_pricing_dummy, norm_values_list)
+# Definition von Variablenlisten, um das Arbeiten mit diesen zu erleichtern
+waterfront_dummies = c('waterfront_0', 'waterfront_1')
+view_dummies = c('view_0', 'view_1', 'view_2', 'view_3','view_4')
+# Definition der Features (der unabhängigen Variablen auf deren Basis die Vorhersagen erzeugt werden sollen)
+features = c('sqft_lot_norm', 'condition_norm', 'grade_norm', 'bathrooms_norm', view_dummies, waterfront_dummies)
+# Definition der Label-Variable (der abhaengigen Variable, die vorhergesagt werden soll) sowie
+label = 'price_norm'
+# Zufallszähler setzen, um die zufällige Partitionierung bei jedem Durchlauf gleich zu halten
+set.seed(1)
+# Bestimmung der Indizes des Traininsdatensatzes
+train_ind <- sample(seq_len(nrow(house_pricing_norm)), size = floor(0.80 * nrow(house_pricing_norm)))
+# Teilen in Trainings- und Testdatensatz
+train_dataset = house_pricing_norm[train_ind, features]
+test_dataset = house_pricing_norm[-train_ind, features]
+# Selektion der Variable, die als Label definiert wurde
+train_labels = house_pricing_norm[train_ind, label]
+test_labels = house_pricing_norm[-train_ind, label]
+```
+
+
+VON STEFFEN!!
 ```{r}
 # Rekodierung von kategoriellen Variablen (zu Dummy-Variablen)
 dummy_list <- c("view", "waterfront")
