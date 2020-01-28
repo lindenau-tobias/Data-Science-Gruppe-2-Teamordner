@@ -335,6 +335,7 @@ mape_tune_models_test <- rbind(mape(test$Ware_1, pred_test1),
 ```
 
 ## Vorhersage für den 01.06.2019 ##
+
 # Vorbereitung #
 ```{r}
 #df mastder_df für den 01-06-2019 erweitern
@@ -354,19 +355,17 @@ master_df_new$X<-NULL
 ```
 
 # Vorhersage #
-
 ```{r}
-df_1_zeile<-master_df_new[2163,]
-
+#df_1_zeile<-master_df_new[2163,]
 
 # Vorhersage für den df_1_zeile (01.06.2019)
-pred_test1 <- predict(best_model1, df_1_zeile)
-pred_test1.1 <- predict(best_model1.1, df_1_zeile)
-pred_test2 <- predict(best_model2, df_1_zeile)
-pred_test3 <- predict(best_model3, df_1_zeile)
-pred_test4 <- predict(best_model4, df_1_zeile)
-pred_test5 <- predict(best_model5, df_1_zeile)
-pred_test6 <- predict(best_model6, df_1_zeile)
+#pred_test1 <- predict(best_model1, df_1_zeile)
+#pred_test1.1 <- predict(best_model1.1, df_1_zeile)
+#pred_test2 <- predict(best_model2, df_1_zeile)
+#pred_test3 <- predict(best_model3, df_1_zeile)
+#pred_test4 <- predict(best_model4, df_1_zeile)
+#pred_test5 <- predict(best_model5, df_1_zeile)
+#pred_test6 <- predict(best_model6, df_1_zeile)
 
 # Vorhersage für den df_1_zeile (01.06.2019)
 vorhersage1_6 <- rbind(vorhersag1 <- predict(best_model1, master_df_new),
@@ -382,47 +381,4 @@ vorhersage1_6_final <- vorhersage1_6[,2163]
 # Als .csv im workspace abspeichern
 write.csv(vorhersage1_6_final, file = "vorhersage1_6_final.csv")
 
-# Vorhersage für einen einzelnen Fall
-#cat(paste0("Vorergesagter Preis:\t", format(test_predictions[100], digits=2, nsmall =0)))
-#cat(paste0("\nTatsächlicher Preis:\t", test_actuals[100]))
-```
-
-# MAPE #
-#```{r}
-#################
-# Checking the prediction Quality
-
-# Calculating the prediction for the training data using the best model according to the grid search
-pred_train <- predict(svm_tune1$best.model, train)
-
-# Calculating the prediction for the test data using the best model according to the grid search
-pred_test <- predict(svm_tune1$best.model, test)
-
-# Calculating the prediction quality for the training data using the MAPE
-mape(train$Ware_1, pred_train)
-
-# Calculating the prediction quality for the training data using the MAPE
-mape(test$Ware_1, pred_test)
-```
-
-ENDE
-
-
-
-
-#```{r}
-#################
-# Checking the prediction Quality
-
-# Calculating the prediction for the training data using the best model according to the grid search
-pred_train <- predict(svm_tune1$best.model, train)
-
-# Calculating the prediction for the test data using the best model according to the grid search
-pred_test <- predict(svm_tune1$best.model, test)
-
-# Calculating the prediction quality for the training data using the MAPE
-mape(train$Ware_1, predict(best_model))
-
-# Calculating the prediction quality for the training data using the MAPE
-mape(test$Ware_1, predict(best_model, newdata = test))
 ```
