@@ -293,22 +293,44 @@ ggplot(data_test[1:100,]) +
 # RMSE #
 ```{r}
 # Calculating the prediction quality for the training data using the RMSE
-rmse(train$Ware_1, pred_train1)
-rmse(train$Ware_1, pred_train1.1)
-rmse(train$Ware_2, pred_train2)
-rmse(train$Ware_3, pred_train3)
-rmse(train$Ware_4, pred_train4)
-rmse(train$Ware_5, pred_train5)
-rmse(train$Ware_6, pred_train6)
+rmse_tune_models_train <- rbind(rmse(train$Ware_1, pred_train1),
+                                rmse(train$Ware_1, pred_train1.1),
+                                rmse(train$Ware_2, pred_train2),
+                                rmse(train$Ware_3, pred_train3),
+                                rmse(train$Ware_4, pred_train4),
+                                rmse(train$Ware_5, pred_train5),
+                                rmse(train$Ware_6, pred_train6))
 
 # Calculating the prediction quality for the training data using the RMSE
-rmse(test$Ware_1, pred_test1)
-rmse(test$Ware_1, pred_test1.1)
-rmse(test$Ware_2, pred_test2)
-rmse(test$Ware_3, pred_test3)
-rmse(test$Ware_4, pred_test4)
-rmse(test$Ware_5, pred_test5)
-rmse(test$Ware_6, pred_test6)
+rmse_tune_models_test <- rbind(rmse(test$Ware_1, pred_test1),
+                                rmse(test$Ware_1, pred_test1.1),
+                                rmse(test$Ware_2, pred_test2),
+                                rmse(test$Ware_3, pred_test3),
+                                rmse(test$Ware_4, pred_test4),
+                                rmse(test$Ware_5, pred_test5),
+                                rmse(test$Ware_6, pred_test6))
+
+```
+
+# MAPE # Keine Werte. Eventuell negative Werte?
+```{r}
+# Calculating the prediction quality for the training data using the RMSE
+mape_tune_models_train <- rbind(mape(train$Ware_1, pred_train1),
+                                mape(train$Ware_1, pred_train1.1),
+                                mape(train$Ware_2, pred_train2),
+                                mape(train$Ware_3, pred_train3),
+                                mape(train$Ware_4, pred_train4),
+                                mape(train$Ware_5, pred_train5),
+                                mape(train$Ware_6, pred_train6))
+
+# Calculating the prediction quality for the training data using the RMSE
+mape_tune_models_test <- rbind(mape(test$Ware_1, pred_test1),
+                                mape(test$Ware_1, pred_test1.1),
+                                mape(test$Ware_2, pred_test2),
+                                mape(test$Ware_3, pred_test3),
+                                mape(test$Ware_4, pred_test4),
+                                mape(test$Ware_5, pred_test5),
+                                mape(test$Ware_6, pred_test6))
 
 ```
 
@@ -331,14 +353,31 @@ master_df_new$X<-NULL
 
 ```
 
+# Vorhersage #
 ```{r}
+
+#df mit nur einer Zeile 01.06.2019 als new data input erstellen
+("2019-06-01","7","6","0", "1", "0", "0", "0", "0", "0", "0", "0", "0","6", "19.5625", "15", "0", "0", "0", "1", "normal")
+
+# Vorhersage mit 
+pred_test1 <- predict(best_model1, test)
+pred_test1.1 <- predict(best_model1.1, test)
+pred_test2 <- predict(best_model2, test)
+pred_test3 <- predict(best_model3, test)
+pred_test4 <- predict(best_model4, test)
+pred_test5 <- predict(best_model5, test)
+pred_test6 <- predict(best_model6, test)
+
+
+
+
 # Vorhersage für einen einzelnen Fall
 cat(paste0("Vorergesagter Preis:\t", format(test_predictions[100], digits=2, nsmall =0)))
 cat(paste0("\nTatsächlicher Preis:\t", test_actuals[100]))
 ```
 
 # MAPE #
-```{r}
+#```{r}
 #################
 # Checking the prediction Quality
 
@@ -355,7 +394,12 @@ mape(train$Ware_1, pred_train)
 mape(test$Ware_1, pred_test)
 ```
 
-```{r}
+ENDE
+
+
+
+
+#```{r}
 #################
 # Checking the prediction Quality
 
