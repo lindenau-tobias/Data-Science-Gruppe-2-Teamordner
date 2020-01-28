@@ -1,0 +1,11 @@
+---
+title: "lineare_Regression_Variablen_Einfluss"
+output: html_notebook
+---
+
+Von Tobias Lindenau
+
+```{r}
+
+```
+
