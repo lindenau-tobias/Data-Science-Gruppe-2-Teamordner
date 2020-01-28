@@ -44,7 +44,7 @@ get.norm_values <- function (.data, select_columns = NULL) {
 ### Aufbereitung der Daten ###
 ```{r}
 # Einlesen der Trainingsdaten
-training_df <- read_csv("train.csv")
+training_df <- read_csv("master_df.csv")
 # Anpassen der Datenformate
 training_df$Datum <- as.Date(training_df$Datum, format = "%Y-%m-%d")
 #training_df$Temperaturklassen <- as.factor(training_df$Temperaturklassen)
@@ -66,7 +66,7 @@ training_df_dummies$X1<-NULL
 write_csv(training_df_dummies, "training_df_dummies.csv")
 
 # Standardisierung von metrischen Variablen
-norm_list <- c("Wochentag", "Monat", "Temperaturklassen")
+norm_list <- c( 'Ware_1', 'Ware_2', 'Ware_3', 'Ware_4', 'Ware_5', 'Ware_6', 'Gesamtumsatz')
 # Berechnung der Mittelwerte und Standardabweichungen der zu standardisierenden Variablen
 norm_values_list <- get.norm_values(training_df_dummies, norm_list)
 # Standardisierung der angegebenen metrischen Variablen
@@ -78,15 +78,15 @@ Temperaturklassen_dummies = c('Temperaturklassen_kalt', 'Temperaturklassen_norma
 # Definition der Features (der unabhängigen Variablen auf deren Basis die Vorhersagen erzeugt werden sollen)
 features = c('Ferien', 'vor_feiertag', Wochentag_dummies, Monat_dummies, Temperaturklassen_dummies)
 # Definition der Label-Variable (der abhaengigen Variable, die vorhergesagt werden soll) sowie
-label = 'predicted_Ware1_norm'
+label = 'Ware_1'
 # Bestimmung der Indizes des Traininsdatensatzes
-train_ind <- sample(seq_len(nrow(house_pricing_norm)), size = floor(0.80 * nrow(house_pricing_norm)))
+train_ind <- sample(seq_len(nrow(training_df_norm)), size = floor(0.80 * nrow(training_df_norm)))
 # Teilen in Trainings- und Testdatensatz
-train_dataset = house_pricing_norm[train_ind, features]
-test_dataset = house_pricing_norm[-train_ind, features]
-# Selektion der Variable, die als Label definiert wurde
-train_labels = house_pricing_norm[train_ind, label]
-test_labels = house_pricing_norm[-train_ind, label]
+train_dataset = training_df_norm[train_ind, features]
+test_dataset = training_df_norm[-train_ind, features]
+#Selektion der Variable, die als Label definiert wurde
+train_labels = training_df_norm[train_ind, label]
+test_labels = training_df_norm[-train_ind, label]
 ```
 
 VON STEFFEN!!
@@ -128,7 +128,7 @@ from tensorflow import keras
 from tensorflow.keras import layers
 # Definition der Form des tiefen neuronalen Netzes (Deep Neural Nets)
 model = keras.Sequential([
-  layers.Dense(5, activation='relu', input_shape=[len(r.training_df_dummies.keys())]),
+  layers.Dense(5, activation='relu', input_shape=[len(r.train_dataset.keys())]),
   layers.Dense(4, activation='relu'),
   layers.Dense(1)
 ])
@@ -138,7 +138,7 @@ model.compile(loss="mse",
 # Ausgabe einer Zusammenfassung zur Form des Modells, das geschaetzt wird (nicht notwendig)
 model.summary()
 # Schaetzung des Modells
-history = model.fit(r.training_df_dummies, r.train_labels, epochs=2, validation_split = 0.1, verbose=0)
+history = model.fit(r.train_dataset, r.train_labels, epochs=150, validation_split = 0.1, verbose=0)
 ```
 
 
@@ -179,8 +179,8 @@ test_predictions_norm <- py$model$predict(test_dataset)
 train_predictions <- (train_predictions_norm * norm_values_list$sd[1] ) + norm_values_list$mean[1]
 test_predictions <- (test_predictions_norm * norm_values_list$sd[1]) + norm_values_list$mean[1]
 # Selektion der zugehörigen tatsächlichen Preise
-train_actuals <- house_pricing$price[train_ind]
-test_actuals <- house_pricing$price[-train_ind]
+train_actuals <- training_df$Ware_1[train_ind]
+test_actuals <- training_df$Ware_1[-train_ind]
 # Vergleich der Gütekriterien für die Traingings- und Testdaten
 cat(paste0("MAPE on the Training Data:\t", format(mape(train_actuals, train_predictions)*100, digits=3, nsmall=2)))
 cat(paste0("\nMAPE on the Test Data:\t\t", format(mape(test_actuals, test_predictions)*100, digits=3, nsmall=2)))
@@ -198,7 +198,7 @@ ggplot(data_train[1:100,]) +
   scale_colour_manual( values = c("Predicted Values"="blue", "Actual Values"="red") ) +
   labs(title="Predicted and Actual Values for the Training Data") +
   xlab("Case Number") +
-  ylab("Price in 1.000 USD") 
+  ylab("Umsatz (€)") 
 # Plot der Ergebnisse der Testdaten
 ggplot(data_test[1:100,]) +
   geom_line( aes(x=1:length(prediction), y=prediction, colour = "Predicted Values" )) +
@@ -206,7 +206,7 @@ ggplot(data_test[1:100,]) +
   scale_colour_manual( values = c("Predicted Values"="blue", "Actual Values"="red") ) +
   labs(title="Predicted and Actual Values for the Test Data") +
   xlab("Case Number") +
-  ylab("Price in 1.000 USD") 
+  ylab("Umsatz (€)") 
 ```
 
 ```{r}
