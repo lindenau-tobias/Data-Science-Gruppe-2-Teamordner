@@ -178,77 +178,91 @@ ggplot(data = scatter_input_lm, aes(x=Ware_2, y=mod1, color = Wochentag))+
 ```
 
 
-### model_svm ###
-```{r}
-#################
-# Training the SVM
 
-# Estimation of an SVM with optimized weighting parameters and given standard hyper parameters
-# Typically not used; instead, the function svm_tune is used in order to also get a model with optimized hyper parameters
-#model_svm <- svm(Gesamtumsatz ~ Ware_1 + Ware_2 + Ware_3 + Ware_4 + Ware_5 + Ware_6 + as.factor(Wochentag), train)
-
-#print(model_svm)
-#summary(model_svm)
-
-```
-
-# estimate model and predict input values
-#Beispiel
-#m   <- svm(x, y)
-#new <- predict(m, x)
-
-### Vorhersage Qualität checken ###
-```{r}
-# test with train data
-#pred_train_model_svm <- predict(model_svm, train)
-
-#View(pred_train_model_svm)
-
-# compute decision values and probabilites
-#pred_train_model_svm <- predict(model_svm, Gesamtumsatz)
-#attr(pred, "decision.values")[1:4,]
-#attr(pred, "probabilities")[1:4,]
-
-```
+### SVM_TUNE Model ###
 
 
-
-### SVM_TUNE ###
-# Ware_2 #
+# Ware_1 #
 ```{r}
 # Estimation of various SVM (each with optimized weighting parameters) using systematically varied hyper parameters (typically called 'grid search' approach) and cross validation
 # the resulting object includes the optimal model in the element named 'best.model'
 #Beispiel: svm_tune <- tune(svm, price ~ bedrooms + bathrooms + sqft_living + zipcode, data=house_pricing_train, ranges = list(epsilon = seq(0.2,1,0.1), cost = 2^(2:3)))
-svm_tune <- tune(svm, Ware_2 ~ as.factor(Wochentag) + as.factor(Temperaturklassen) + as.factor(Ferien) + as.factor(vor_feiertag) + as.factor(Monat), data=train, ranges = list(epsilon = seq(0.2,1,0.1), cost = 2^(2:3)))
 
-print(svm_tune)
-summary(svm_tune)
+svm_tune1 <- tune(svm, Ware_1 ~ as.factor(Wochentag) + as.factor(Temperaturklassen) + as.factor(Ferien) + as.factor(vor_feiertag) + as.factor(Monat), data=train, ranges = list(epsilon = seq(0,1,0.1), cost = 2^(2:6)))
+
+print(svm_tune1)
+summary(svm_tune1)
+plot(svm_tune1)
 ```
+
+# Ware_2 #
+```{r}
+
+svm_tune2 <- tune(svm, Ware_2 ~ as.factor(Wochentag) + as.factor(Temperaturklassen) + as.factor(Ferien) + as.factor(vor_feiertag) + as.factor(Monat), data=train, ranges = list(epsilon = seq(0.2,1,0.1), cost = 2^(2:3)))
+
+print(svm_tune2)
+summary(svm_tune2)
+```
+
+# Ware_3 #
+```{r}
+svm_tune3 <- tune(svm, Ware_3 ~ as.factor(Wochentag) + as.factor(Temperaturklassen) + as.factor(Ferien) + as.factor(vor_feiertag) + as.factor(Monat), data=train, ranges = list(epsilon = seq(0.2,1,0.1), cost = 2^(2:3)))
+
+print(svm_tune3)
+summary(svm_tune3)
+```
+
+
+# Ware_4 #
+```{r}
+svm_tune4 <- tune(svm, Ware_4 ~ as.factor(Wochentag) + as.factor(Temperaturklassen) + as.factor(Ferien) + as.factor(vor_feiertag) + as.factor(Monat), data=train, ranges = list(epsilon = seq(0.2,1,0.1), cost = 2^(2:3)))
+
+print(svm_tune4)
+summary(svm_tune4)
+```
+
+# Ware_5 #
+```{r}
+svm_tune5 <- tune(svm, Ware_5 ~ as.factor(Wochentag) + as.factor(Temperaturklassen) + as.factor(Ferien) + as.factor(vor_feiertag) + as.factor(Monat), data=train, ranges = list(epsilon = seq(0.2,1,0.1), cost = 2^(2:3)))
+
+print(svm_tune5)
+summary(svm_tune5)
+```
+
+# Ware_6 #
+```{r}
+svm_tune6 <- tune(svm, Ware_6 ~ as.factor(Wochentag) + as.factor(Temperaturklassen) + as.factor(Ferien) + as.factor(vor_feiertag) + as.factor(Monat), data=train, ranges = list(epsilon = seq(0.2,1,0.1), cost = 2^(2:3)))
+
+print(svm_tune6)
+summary(svm_tune6)
+```
+
+
 
 ```{r}
 # find the best parameters
-summary(tune.out)$best.parameters
+summary(svm_tune1)$best.parameters
 
 # the best model
-best_model = tune.out$best.model
+best_model = svm_tune1$best.model
 
 ```
 
 
 ## beobachteten und modellierten Umsatz der SVM_Tune vergleichen ##
 ```{r}
-pred_train <- predict(svm_tune$best.model, newdata = test)
+pred_train <- predict(svm_tune1$best.model, newdata = test)
 
-rmse_svm <- rmse(test$Gesamtumsatz, pred_train)
+rmse_svm <- rmse(test$Ware_1, pred_train)
 
 scatter_input <- test %>%
-  select(Gesamtumsatz) %>%
+  select(Ware_1) %>%
   mutate(pred_Umsatz = rmse_svm)
 
 scatter_input <- scatter_input %>%
   mutate(pred_Umsatz = rmse_svm)
 
-ggplot(data = scatter_input, aes(x=Gesamtumsatz, y = pred_Umsatz))+
+ggplot(data = scatter_input, aes(x=Ware_1, y = pred_Umsatz))+
   geom_point()+
   geom_abline(slope = 1, intercept = 0)+
   scale_x_continuous(limits = c(500, 3050))+
@@ -261,20 +275,55 @@ ggplot(data = scatter_input, aes(x=Gesamtumsatz, y = pred_Umsatz))+
 #Vermutlich overfitting
 ```
 
+# RMSE #
+```{r}
+#################
+# Checking the prediction Quality
+
+# Calculating the prediction for the training data using the best model according to the grid search
+pred_train <- predict(best_model, train)
+
+# Calculating the prediction for the test data using the best model according to the grid search
+pred_test <- predict(best_model, test)
+
+# Calculating the prediction quality for the training data using the MAPE
+rmse(train$Ware_1, pred_train)
+
+# Calculating the prediction quality for the training data using the MAPE
+rmse(test$Ware_1, pred_test)
+```
+
+# MAPE #
+```{r}
+#################
+# Checking the prediction Quality
+
+# Calculating the prediction for the training data using the best model according to the grid search
+pred_train <- predict(svm_tune1$best.model, train)
+
+# Calculating the prediction for the test data using the best model according to the grid search
+pred_test <- predict(svm_tune1$best.model, test)
+
+# Calculating the prediction quality for the training data using the MAPE
+mape(train$Ware_1, pred_train)
+
+# Calculating the prediction quality for the training data using the MAPE
+mape(test$Ware_1, pred_test)
+```
 
 ```{r}
 #################
 # Checking the prediction Quality
 
 # Calculating the prediction for the training data using the best model according to the grid search
-pred_train <- predict(svm_tune$best.model, train)
+pred_train <- predict(svm_tune1$best.model, train)
 
 # Calculating the prediction for the test data using the best model according to the grid search
-pred_test <- predict(svm_tune$best.model, test)
+pred_test <- predict(svm_tune1$best.model, test)
 
 # Calculating the prediction quality for the training data using the MAPE
-mape(train$Gesamtumsatz, pred_train)
+mape(train$Ware_1, predict(best_model))
 
 # Calculating the prediction quality for the training data using the MAPE
-mape(test$Gesamtumsatz, pred_test)
+mape(test$Ware_1, predict(best_model, newdata = test))
 ```
