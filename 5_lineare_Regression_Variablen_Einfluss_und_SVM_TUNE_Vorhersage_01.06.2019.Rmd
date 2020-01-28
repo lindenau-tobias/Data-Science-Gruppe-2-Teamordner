@@ -244,7 +244,7 @@ best_model6 = svm_tune6$best.model
 Modelle darstellen
 
 ```{r}
-plot(train$Datum, train$Ware_1)
+#plot(train$Datum, train$Ware_1)
 
 
 ```
@@ -274,8 +274,8 @@ pred_test5 <- predict(best_model5, test)
 pred_test6 <- predict(best_model6, test)
 
 
-pred_01.01. <- predict(best_model1, Datum = 2019-01-16)
-view(pred_01.01.)
+#pred_01.01. <- predict(best_model1, Datum = 2019-01-16)
+#view(pred_01.01.)
 ```
 
 Graphisch vergleichen
