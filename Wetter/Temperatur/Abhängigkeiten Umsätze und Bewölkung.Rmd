@@ -21,8 +21,10 @@ library(hrbrthemes)
 library(reshape2)
 
 # Einlesen der Umsatzdaten
-setwd("C:/Users/Tobias/Documents/Data Science Gruppe 2 Teamordner")
+#setwd("C:/Users/Tobias/Documents/Data Science Gruppe 2 Teamordner")
 umsatzdaten <- read_csv("umsatzdaten_gekuerzt.csv")
+umsatzdaten_gekuerzt <- read_csv("umsatzdaten_gekuerzt.csv", 
+    col_types = cols(Datum = col_date(format = "%Y-%m-%d")))
 sd_umsatz <- sd(umsatzdaten$Umsatz)
 #sd <- sqrt(var(umsatzdaten$Umsatz))
 
