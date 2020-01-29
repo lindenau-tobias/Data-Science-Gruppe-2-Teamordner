@@ -310,6 +310,8 @@ rmse_tune_models_test <- rbind(rmse(test$Ware_1, pred_test1),
                                 rmse(test$Ware_5, pred_test5),
                                 rmse(test$Ware_6, pred_test6))
 
+
+summary(rmse(train$Ware_1, pred_train1))
 ```
 
 # MAPE # Keine Werte. Eventuell negative Werte?
