@@ -1,0 +1,213 @@
+---
+title: "Zeitpunkt_Monat"
+output: html_notebook
+Ziel: "Welchen Einfluss hat das Jahr und die Lage im Monat auf den Umsatz?"
+Autor: "Merle Oelbüttel"
+Datum des Erstellens: "01.12.2019"
+---
+
+
+
+```{r}
+#Laden der Bibliotheken
+
+library(readr)
+library(tidyverse)
+library(lubridate)
+library(ggplot2)
+library(dplyr)
+```
+
+
+Einlesen und Vorbereitung der Daten (rauskopiert aus Zeitpunkt_Wochentage)
+```{r}
+#Einlesen der Daten
+
+umsatz <- read_csv("umsatzdaten_gekuerzt.csv", 
+    col_types = cols(Datum = col_datetime(format = " %Y-%m-%d   "))) #Eingeben des Datums
+```
+
+
+Wie war der Umsatz in den Unterschiedlichen Jahren?
+```{r}
+#Erstellung der Variable mit Jahr
+umsatz$jahr <- year(umsatz$Datum)
+
+#Tabelle für den Umsatz nach Warengruppen  und Jahren
+ware_jahr<- umsatz %>%
+  group_by(jahr, Warengruppe) %>%
+  summarise(
+    n=n(), #ist praktisch, weil es die Anzahl z?hlt
+    mean=mean(Umsatz),
+    sd=sd(Umsatz),
+    summe=sum(Umsatz)) %>%
+  mutate( se=sd/sqrt(n))  %>%
+  mutate( ic=se * qt((1-0.05)/2 + .5, n-1))
+
+
+
+# nach Warengruppe nach Jahren den Umsatz plotten
+ggplot(ware_jahr) +
+  geom_bar( aes(x=Warengruppe, y=mean), stat="identity", fill="forestgreen", alpha=0.5) +
+  geom_errorbar( aes(x=Warengruppe, ymin=mean-ic, ymax=mean+ic), width=0.4, colour="orange", alpha=0.9, size=1.5) +
+  ylab("Durchschnitt (€)")+
+ facet_wrap(~jahr)+
+  ggtitle("Umsatz nach Warengruppe und Jahr")
+
+
+```
+über den Gesamten Zeitraum den allgemeinen Umsatz plotten
+```{r}
+
+#Summe der Jahre bilden 
+sum_tag<- umsatz %>%
+  group_by(Datum) %>%
+  summarise(
+    n=n(), #ist praktisch, weil es die Anzahl z?hlt
+    mean=mean(Umsatz),
+    sd=sd(Umsatz),
+    summe=sum(Umsatz)) %>%
+  mutate( se=sd/sqrt(n))  %>%
+  mutate( ic=se * qt((1-0.05)/2 + .5, n-1))
+#nach Warengruppe an den Monatstagen den Umsatz plotten
+
+ggplot(sum_tag, aes(x=Datum, y=summe)) +
+  geom_point() +
+  geom_smooth(method=lm , color="red", se=FALSE) +
+    geom_label( 
+    data=sum_tag %>% filter(summe>=2000), # alles mit einer Summe ab 2000€ gelabelt
+    aes(label=Datum)
+  )+
+  xlab("Jahr")+
+  ylab("Summe Umsatz (€)")
+  ggtitle("Umsatz über den gesamten Zeitraum")
+```
+über den Gesamten Zeitraum die Unterschiede in den einzelnen Warengruppen plotten
+```{r}
+
+#nach Warengruppe an den Monatstagen den Umsatz plotten
+
+ggplot(umsatz, aes(x=Datum, y=Umsatz)) +
+  geom_point() +
+  facet_wrap(~Warengruppe)+
+  xlab("Jahr")+
+  ylab("Summe Umsatz (€)")+
+  ggtitle ("Umsatz über den gesamten Zeitraum nach Warengruppen")
+
+
+```
+
+```{r}
+#Balkendiagramm der Summe Umsätze je Jahr(ohne Konfidenzintervall)
+ggplot(ware_jahr) +
+  geom_bar( aes(x=Warengruppe, y=summe), stat="identity") +
+   ylab("Summe(€)")+
+ facet_wrap(~jahr)+
+  ggtitle("Summe der  Warengruppe in den Jahren")
+
+```
+
+gucken, wie die Unterschiedlichen Warengruppen in den Jahren liefen
+```{r}
+ggplot(ware_jahr, aes(x=jahr, y=mean)) +
+  geom_point() +
+  geom_smooth(method=lm , color="red", fill="#69b3a2", se=TRUE)+
+  xlab ("Jahr")+
+  ylab("Durchschnitt (€)")+
+  facet_wrap(~Warengruppe)+
+  ggtitle("Umsatz nach Warengruppe und Jahr")
+
+
+```
+
+Daten nach Tage eines Monats definieren
+```{r}
+umsatz$monatstag<- mday(umsatz$Datum)
+```
+
+Gucken, ob der Umsatz an den Monatstagen deutlich varriert
+```{r}
+sum_monatstage<- umsatz %>%
+  group_by(monatstag) %>%
+  summarise(
+    n=n(), #ist praktisch, weil es die Anzahl z?hlt
+    mean=mean(Umsatz),
+    sd=sd(Umsatz),
+    summe=sum(Umsatz)) %>%
+  mutate( se=sd/sqrt(n))  %>%
+  mutate( ic=se * qt((1-0.05)/2 + .5, n-1))
+
+
+```
+
+
+nach den Tagen den allgemeinen Umsatz plotten
+```{r}
+# nach Warengruppe an den Monatstagen den Umsatz plotten
+
+ggplot(sum_monatstage, aes(x=monatstag, y=mean)) +
+  geom_point() +
+  geom_smooth(method=lm , color="red", fill="#69b3a2", se=TRUE)+
+  xlab ("Tage im Monat")+
+  ylab("Durchschnitt (€)")+
+  ggtitle("Umsatz im Monatsverlauf")
+
+
+```
+
+
+Den Umsatz für Waren der Monatstage rausfinden
+```{r}
+ware_monatstage<- umsatz %>%
+  group_by(monatstag, Warengruppe) %>%
+  summarise(
+    n=n(), #ist praktisch, weil es die Anzahl z?hlt
+    mean=mean(Umsatz),
+    sd=sd(Umsatz),
+    summe=sum(Umsatz)) %>%
+  mutate( se=sd/sqrt(n))  %>%
+  mutate( ic=se * qt((1-0.05)/2 + .5, n-1))
+
+        
+```
+
+
+
+
+```{r}
+# nach Warengruppe an den Monatstagen den Umsatz plotten (Scatterplot)
+
+ggplot(ware_monatstage, aes(x=monatstag, y=mean)) +
+  geom_point() +
+  geom_smooth(method=lm , color="red", fill="#69b3a2", se=TRUE)+
+  facet_wrap(~Warengruppe)+
+  ggtitle("Umsatz nach Warengruppe und Monatstag")
+
+
+```
+
+```{r}
+#Monat an den Datensatz heranhängen
+umsatz$monat<- month(umsatz$Datum) 
+
+#den Umsatz nach den Monaten filtern
+ware_monat<- umsatz %>%
+  group_by(monat, Warengruppe) %>%
+  summarise(
+    n=n(), #ist praktisch, weil es die Anzahl z?hlt
+    mean=mean(Umsatz),
+    sd=sd(Umsatz),
+    summe=sum(Umsatz)) %>%
+  mutate( se=sd/sqrt(n))  %>%
+  mutate( ic=se * qt((1-0.05)/2 + .5, n-1))
+
+# nach Warengruppe in den unterschiedlichen Monaten den Umsatz plotten (Scatterplot)
+ggplot(ware_monat, aes(x=monat, y=mean)) +
+  geom_point() +
+  geom_smooth(method=lm , color="red", fill="#69b3a2", se=TRUE)+
+  facet_wrap(~Warengruppe)+
+  xlab("Monat")+
+  ylab("Durchschnittlicher Umsatz (€)")
+  ggtitle("Umsatz nach Warengruppe und Monat")
+```
+

@@ -1,0 +1,385 @@
+---
+title: "Support Vector Machine Vorhersage fuer den 01.06.2019"
+output: html_notebook
+---
+Erstellt am 20.01.2020
+Von Tobias Lindenau
+
+
+Pakete installieren
+```{r}
+#install.packages("dataPreparation")
+#install.packages("e1071")
+#install.packages("ISLR")
+#install.packages("timeDate")
+
+# Importing Function Packages
+
+library(dataPreparation)
+library(readr)
+library(dplyr)
+library(lubridate)
+library(broom)
+library(ggplot2)
+library(timeDate)
+library(Metrics)
+library(e1071)
+library(knitr)
+
+library(tidyverse)
+
+```
+
+Einlesen der Daten
+```{r}
+# master df einlesen
+master_df <- read.csv("master_df.csv")
+
+master_df$Datum <- as.Date(master_df$Datum, format = "%Y-%m-%d")
+
+#X Spalte loeschen
+master_df$X<-NULL
+
+```
+
+Temperaturklassen neu berechnen, da diese NA Werte enthalten
+```{r}
+# Klasseneinteilung in kalt (Temp<10), normla (Temp10-20) und warm (Temp>20)
+master_df$Temperaturklassen <- "kalt"
+master_df$Temperaturklassen[master_df$Temperatur > 10 & master_df$Temperatur < 20] <- "normal"
+master_df$Temperaturklassen[master_df$Temperatur > 20] <- "warm"
+
+```
+
+NA Werte in 0 umwandeln
+```{r}
+master_df[is.na(master_df)] <- 0
+```
+
+### Trainings- und Testdatensatz erzeugen ###
+
+Trainings- und Testdatensatz erzeugen.
+```{r}
+set.seed(123)
+samples <- sample.int(n = nrow(master_df), size = floor(0.8*nrow(master_df)), replace = FALSE)
+train <- master_df[samples, ]
+test <- master_df[-samples,]
+```
+
+Etwas abgewandelter Code zum erzeugen von Trainings- und Testdaten
+```{r}
+#library(ISLR)
+#attach(master_df)
+#smp_siz = floor(0.75*nrow(master_df))  # creates a value for dividing the data into train and test. In this case the value is defined as 75% of the number of rows in the dataset
+#smp_siz  # shows the value of the sample size
+
+#samples <- sample.int(n = nrow(master_df), size = floor(0.7*nrow(master_df)), replace = FALSE)
+#train <- master_df[samples, ]
+#validation <- master_df[-samples,]
+```
+
+Noch eine Variante, um Trainings- und Testdatensatz erzeugen.
+```{r}
+#set.seed(123)   # set seed to ensure you always have same random numbers generated
+
+#train_ind = sample(seq_len(nrow(master_df)),size = smp_siz)  # Randomly identifies therows equal to sample size ( defined in previous instruction) from  all the rows of master_df dataset and stores the row number in train_ind
+
+#train =master_df[train_ind,] #creates the training dataset with row numbers stored in train_ind
+
+#test=master_df[-train_ind,]  # creates the test dataset excluding the row numbers mentioned in train_ind
+```
+
+Trainings- und Testdatensatz speichern
+```{r}
+write.csv (train, file = "train.csv")
+write.csv (test, file = "test.csv")
+
+```
+
+Moeglichkeit den Datensatz auf seine Plausibilitaet zu checken
+```{r}
+#################
+# Data Preparation
+
+# Option to check the correctnes of the code with a small (and computationally fast) training data set
+# Do not run or uncomment the following line if you want to reduce the dataset size
+###train <- sample_frac(train, .10)
+```
+
+
+
+### Model vorbereiten ###
+
+## Lineare Regression ##
+Einfluss der Variablen je Warengruppe testen              #Wettercode rausgenommen, da test und train nicht die selben codes haben
+
+# Ware_2 #
+```{r}
+#Ware_1 Umsätze
+mod1 <- lm(Ware_2 ~ as.factor(Wochentag), train)
+mod2 <- lm(Ware_2 ~ as.factor(Wochentag), train)
+mod3 <- lm(Ware_2 ~ as.factor(Wochentag) + as.factor(Temperaturklassen), train)
+mod4 <- lm(Ware_2 ~ as.factor(Wochentag) + as.factor(Temperaturklassen) + as.factor(nach_feiertag) + as.factor(vor_feiertag), train)
+mod5 <- lm(Ware_2 ~ as.factor(Wochentag) + as.factor(Temperaturklassen) + as.factor(Ferien) + as.factor(vor_feiertag), train)
+mod6 <- lm(Ware_2 ~ as.factor(Wochentag) + as.factor(Temperaturklassen) + as.factor(Ferien) + as.factor(vor_feiertag) + as.factor(KielerWoche), train)
+mod7 <- lm(Ware_2 ~ as.factor(Wochentag) + as.factor(Temperaturklassen) + as.factor(Ferien) + as.factor(vor_feiertag) + as.factor(Monat), train)
+
+summary(mod7)
+
+model_result <- rbind(glance(mod1), glance(mod2), glance(mod3), glance(mod4), glance(mod5), glance(mod6), glance(mod7))
+
+
+# Model Prediction Quality for the Training Data Using the  RMSE
+rmse_models <- rbind(rmse(train$Ware_2, predict(mod1)),
+                     rmse(train$Ware_2, predict(mod2)),
+                     rmse(train$Ware_2, predict(mod3)), 
+                     rmse(train$Ware_2, predict(mod4)),
+                     rmse(train$Ware_2, predict(mod5)),
+                     rmse(train$Ware_2, predict(mod6)),
+                     rmse(train$Ware_2, predict(mod7))) 
+
+# Model Prediction Quality for the (Unknown) Test Data Using the RMSE
+rmse_models_test <- rbind(rmse(test$Ware_2, predict(mod1, newdata = test)),
+                          rmse(test$Ware_2, predict(mod2, newdata = test)),
+                          rmse(test$Ware_2, predict(mod3, newdata = test)),
+                          rmse(test$Ware_2, predict(mod4, newdata = test)),
+                          rmse(test$Ware_2, predict(mod5, newdata = test)),
+                          rmse(test$Ware_2, predict(mod6, newdata = test)),
+                          rmse(test$Ware_2, predict(mod7, newdata = test))) 
+
+mod1_pred <- predict(mod1, newdata = test)
+mod2_pred <- predict(mod2, newdata = test)
+mod3_pred <- predict(mod3, newdata = test)
+mod4_pred <- predict(mod4, newdata = test)
+mod5_pred <- predict(mod5, newdata = test)
+mod6_pred <- predict(mod6, newdata = test)
+mod7_pred <- predict(mod7, newdata = test)
+
+scatter_input_lm <- test %>%
+  select(Ware_2, Wochentag) %>%
+  mutate(mod1 = mod1_pred,
+         mod2 = mod2_pred,
+         mod3 = mod3_pred,
+         mod4 = mod4_pred,
+         mod5 = mod5_pred,
+         mod6 = mod6_pred,
+         mod7 = mod7_pred)
+
+ggplot(data = scatter_input_lm, aes(x=Ware_2, y=mod1, color = Wochentag))+
+  geom_point()+
+  geom_abline(slope = 1, intercept = 0)+
+  labs(title = "Vergleich beobachteten und modellierten Umsatz",
+       caption = "basierend auf dem test Datensatz") +
+  scale_x_continuous(limits = c(1000, 2000))+
+  scale_y_continuous(limits = c(1000, 2000))+
+  xlab("Beobachteter Umsatz")+
+  ylab("Vorhergesagter Umsatz")+
+  theme(text = element_text(size = 10))
+```
+
+
+### SVM_TUNE Model ###
+
+```{r}
+# Estimation of various SVM (each with optimized weighting parameters) using systematically varied hyper parameters (typically called 'grid search' approach) and cross validation
+# the resulting object includes the optimal model in the element named 'best.model'
+#Beispiel: svm_tune <- tune(svm, price ~ bedrooms + bathrooms + sqft_living + zipcode, data=house_pricing_train, ranges = list(epsilon = seq(0.2,1,0.1), cost = 2^(2:3)))
+
+# Ware_1 #
+svm_tune1 <- tune(svm, Ware_1 ~ Datum + as.factor(Wochentag) + as.factor(Temperaturklassen) + as.factor(Ferien) + as.factor(vor_feiertag) + as.factor(Monat), data=train, ranges = list(epsilon = seq(0.2,1,0.1), cost = 2^(2:3)))
+
+print(svm_tune1)
+summary(svm_tune1)
+plot(svm_tune1)
+
+#plot im Gruppenordner abspeichern
+#png('svm_tune1_Performance_e_0,2-1-0,1_cost_2-6.png')
+#plot(svm_tune1)
+#dev.off()
+
+# Ware_1 # neue cost und e Einstellung
+svm_tune1.1 <- tune(svm, Ware_1 ~ as.factor(Wochentag) + as.factor(Temperaturklassen) + as.factor(Ferien) + as.factor(vor_feiertag) + as.factor(Monat), data=train, ranges = list(epsilon = seq(0,1,0.1), cost = 2^(2:4)))
+
+# Ware_2 #
+svm_tune2 <- tune(svm, Ware_2 ~ as.factor(Wochentag) + as.factor(Temperaturklassen) + as.factor(Ferien) + as.factor(vor_feiertag) + as.factor(Monat), data=train, ranges = list(epsilon = seq(0.2,1,0.1), cost = 2^(2:3)))
+
+# Ware_3 #
+svm_tune3 <- tune(svm, Ware_3 ~ as.factor(Wochentag) + as.factor(Temperaturklassen) + as.factor(Ferien) + as.factor(vor_feiertag) + as.factor(Monat), data=train, ranges = list(epsilon = seq(0.2,1,0.1), cost = 2^(2:3)))
+
+# Ware_4 #
+svm_tune4 <- tune(svm, Ware_4 ~ as.factor(Wochentag) + as.factor(Temperaturklassen) + as.factor(Ferien) + as.factor(vor_feiertag) + as.factor(Monat), data=train, ranges = list(epsilon = seq(0.2,1,0.1), cost = 2^(2:3)))
+
+# Ware_5 #
+svm_tune5 <- tune(svm, Ware_5 ~ as.factor(Wochentag) + as.factor(Temperaturklassen) + as.factor(Ferien) + as.factor(vor_feiertag) + as.factor(Monat), data=train, ranges = list(epsilon = seq(0.2,1,0.1), cost = 2^(2:3)))
+
+# Ware_6 #
+svm_tune6 <- tune(svm, Ware_6 ~ as.factor(Wochentag) + as.factor(Temperaturklassen) + as.factor(Ferien) + as.factor(vor_feiertag) + as.factor(Monat), data=train, ranges = list(epsilon = seq(0.2,1,0.1), cost = 2^(2:3)))
+
+```
+
+
+# Variablen für das beste Model erstellen #
+```{r}
+# find the best parameters
+summary(svm_tune1)$best.parameters
+summary(svm_tune1.1)$best.parameters
+summary(svm_tune2)$best.parameters
+summary(svm_tune3)$best.parameters
+summary(svm_tune4)$best.parameters
+summary(svm_tune5)$best.parameters
+summary(svm_tune6)$best.parameters
+
+# the best model
+best_model1 = svm_tune1$best.model
+best_model1.1 = svm_tune1.1$best.model
+best_model2 = svm_tune2$best.model
+best_model3 = svm_tune3$best.model
+best_model4 = svm_tune4$best.model
+best_model5 = svm_tune5$best.model
+best_model6 = svm_tune6$best.model
+
+```
+
+Modelle darstellen
+
+```{r}
+#plot(train$Datum, train$Ware_1)
+
+
+```
+
+
+# Vorhersagequalitaet #
+```{r}
+#################
+# Checking the prediction Quality
+
+# Calculating the prediction for the training data using the best model according to the grid search
+pred_train1 <- predict(best_model1, train)
+pred_train1.1 <- predict(best_model1.1, train)
+pred_train2 <- predict(best_model2, train)
+pred_train3 <- predict(best_model3, train)
+pred_train4 <- predict(best_model4, train)
+pred_train5 <- predict(best_model5, train)
+pred_train6 <- predict(best_model6, train)
+
+# Calculating the prediction for the test data using the best model according to the grid search
+pred_test1 <- predict(best_model1, test)
+pred_test1.1 <- predict(best_model1.1, test)
+pred_test2 <- predict(best_model2, test)
+pred_test3 <- predict(best_model3, test)
+pred_test4 <- predict(best_model4, test)
+pred_test5 <- predict(best_model5, test)
+pred_test6 <- predict(best_model6, test)
+
+
+#pred_01.01. <- predict(best_model1, Datum = 2019-01-16)
+#view(pred_01.01.)
+```
+
+Graphisch vergleichen
+```{r}
+#ggplot(data_test[1:100,]) +
+#  geom_line( aes(x=1:length(prediction), y=prediction, colour = "Predicted Values" )) +
+#  geom_line( aes(x=1:length(actual), y=actual, colour = "Actual Values" )) +
+#  scale_colour_manual( values = c("Predicted Values"="blue", "Actual Values"="red") ) +
+#  labs(title="Predicted and Actual Values for the Test Data") +
+#  xlab("Case Number") +
+#  ylab("Price in 1.000 USD") 
+```
+
+
+# RMSE #
+```{r}
+# Calculating the prediction quality for the training data using the RMSE
+rmse_tune_models_train <- rbind(rmse(train$Ware_1, pred_train1),
+                                rmse(train$Ware_1, pred_train1.1),
+                                rmse(train$Ware_2, pred_train2),
+                                rmse(train$Ware_3, pred_train3),
+                                rmse(train$Ware_4, pred_train4),
+                                rmse(train$Ware_5, pred_train5),
+                                rmse(train$Ware_6, pred_train6))
+
+# Calculating the prediction quality for the training data using the RMSE
+rmse_tune_models_test <- rbind(rmse(test$Ware_1, pred_test1),
+                                rmse(test$Ware_1, pred_test1.1),
+                                rmse(test$Ware_2, pred_test2),
+                                rmse(test$Ware_3, pred_test3),
+                                rmse(test$Ware_4, pred_test4),
+                                rmse(test$Ware_5, pred_test5),
+                                rmse(test$Ware_6, pred_test6))
+
+
+summary(rmse(train$Ware_1, pred_train1))
+```
+
+# MAPE # Keine Werte. Eventuell negative Werte? Oder weil die NA Werte in Nullen umgewandelt wurden?
+```{r}
+# Calculating the prediction quality for the training data using the RMSE
+mape_tune_models_train <- rbind(mape(train$Ware_1, pred_train1),
+                                mape(train$Ware_1, pred_train1.1),
+                                mape(train$Ware_2, pred_train2),
+                                mape(train$Ware_3, pred_train3),
+                                mape(train$Ware_4, pred_train4),
+                                mape(train$Ware_5, pred_train5),
+                                mape(train$Ware_6, pred_train6))
+
+# Calculating the prediction quality for the training data using the RMSE
+mape_tune_models_test <- rbind(mape(test$Ware_1, pred_test1),
+                                mape(test$Ware_1, pred_test1.1),
+                                mape(test$Ware_2, pred_test2),
+                                mape(test$Ware_3, pred_test3),
+                                mape(test$Ware_4, pred_test4),
+                                mape(test$Ware_5, pred_test5),
+                                mape(test$Ware_6, pred_test6))
+
+```
+
+## Vorhersage fuer den 01.06.2019 ##
+
+# Vorbereitung #
+```{r}
+#df mastder_df für den 01-06-2019 erweitern
+master_df[nrow(master_df) + 1,] = list("2019-06-01","7","6","0", "1", "0", "0", "0", "0", "0", "0", "0", "0","6", "19.5625", "15", "0", "0", "0", "1", "normal") #Zeileninhalt für den Tag 01.06.2019 manuell geändert
+
+# Als .csv im workspace abspeichern
+write.csv(master_df, file = "master_df_01.06.2019.csv")
+
+# Neuen master_df laden.        
+master_df_new <- read.csv("master_df_01.06.2019.csv")
+
+master_df_new$Datum <- as.Date(master_df$Datum, format = "%Y-%m-%d")
+
+#X Spalte loeschen
+master_df_new$X<-NULL
+
+```
+
+# Vorhersage #
+```{r}
+#df_1_zeile<-master_df_new[2163,]
+
+# Vorhersage für den df_1_zeile (01.06.2019)
+#pred_test1 <- predict(best_model1, df_1_zeile)
+#pred_test1.1 <- predict(best_model1.1, df_1_zeile)
+#pred_test2 <- predict(best_model2, df_1_zeile)
+#pred_test3 <- predict(best_model3, df_1_zeile)
+#pred_test4 <- predict(best_model4, df_1_zeile)
+#pred_test5 <- predict(best_model5, df_1_zeile)
+#pred_test6 <- predict(best_model6, df_1_zeile)
+
+# Vorhersage für den df_1_zeile (01.06.2019)
+vorhersage1_6 <- rbind(vorhersag1 <- predict(best_model1, master_df_new),
+                     vorhersage1.1 <- predict(best_model1.1, master_df_new),
+                     vorhersage2 <- predict(best_model2, master_df_new),
+                     vorhersage3 <- predict(best_model3, master_df_new),
+                     vorhersage4 <- predict(best_model4, master_df_new),
+                     vorhersage5 <- predict(best_model5, master_df_new),
+                     vorhersage6 <- predict(best_model6, master_df_new))
+
+vorhersage1_6_final <- vorhersage1_6[,2162]
+
+# Als .csv im workspace abspeichern
+write.csv(vorhersage1_6_final, file = "vorhersage1_6_final.csv")
+
+```

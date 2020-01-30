@@ -2,6 +2,8 @@
 title: "Support Vector Machine Vorhersage für den 01.06.2019"
 output: html_notebook
 ---
+(alte Version. Aktuelle Programmdatei:5_lineare_Regression_Variablen_Einfluss_und_SVM_TUNE_Vorhersage_01.06.2019)"
+
 Erstellt am 20.01.2020
 Von Tobias Lindenau
 

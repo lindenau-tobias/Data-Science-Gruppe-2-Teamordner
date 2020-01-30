@@ -1,0 +1,99 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+1. Packages und Daten laden
+```{r}
+# Installation der benötigten Packages
+##install.packages("lubridate")
+#install.packages("viridis")
+#install.packages("hrbrthemes")
+#install.packages("reshape2")
+
+# Einbinden benötigter Bibliotheken
+library(readr)
+library(lubridate)
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(hrbrthemes)
+library(reshape2)
+
+# Einlesen der Umsatzdaten
+#setwd("C:/Users/Tobias/Documents/Data Science Gruppe 2 Teamordner")
+umsatzdaten <- read_csv("umsatzdaten_gekuerzt.csv")
+umsatzdaten_gekuerzt <- read_csv("umsatzdaten_gekuerzt.csv", 
+    col_types = cols(Datum = col_date(format = "%Y-%m-%d")))
+sd_umsatz <- sd(umsatzdaten$Umsatz)
+#sd <- sqrt(var(umsatzdaten$Umsatz))
+
+# Einlesen der Wetter (Temperatur)
+setwd("C:/Users/Tobias/Documents/Data Science Gruppe 2 Teamordner")
+wetter <- read_csv("wetter.csv")
+sd_temp <- sd(wetter$Temperatur)
+```
+
+2. Tabelle Umsatz und Wetter mergen und als .csv abspeichern
+```{r}
+#Tabelle Umsatz und Wetter zusammenführen
+merge_um_wet <- merge(umsatzdaten,wetter,by="Datum")
+
+# Als .csv im workspace abspeichern
+write.csv(merge_um_wet, file = "merge_um_wet.csv")
+```
+
+
+
+4. Grundlegende Untersuchungen der Abhängigkeit (Temp-Umsatz)
+```{r}
+ggplot(merge_um_wet, aes(x=Bewoelkung, y=Umsatz)) +
+  geom_point() +
+  geom_smooth(method=lm , color="red", fill="#69b3a2", se=TRUE) +
+  theme_ipsum()
+
+
+
+hist(merge_um_wet$Umsatz,  main="" , breaks=30 , col=rgb(0.3,0.5,1,0.4) , xlab="Umsatz" , ylab="Anzahl der Tage")
+
+plot(merge_um_wet$Umsatz , merge_um_wet$Bewoelkung,  main="" , pch=20 , cex=0.4 , col=rgb(0.3,0.5,1,0.4)  , xlab="Umsatz" , ylab="Bewölkung" )
+
+plot(merge_um_wet$Bewoelkung , merge_um_wet$Umsatz,  main="" , pch=20 , cex=0.4 , col=rgb(0.3,0.5,1,0.4)  , xlab="Bewölkung" , ylab="Umsatz" )
+```
+
+
+5. Balkendiagramm (Bewölkung-Umsatz)
+```{r}
+# Balkendiagramm erstellen
+ggplot(merge_um_wet, aes(x=Bewoelkung, y=Umsatz)) +
+  geom_bar(stat = "identity")
+
+```
+
+
+
+5. Balkendiagramm (Bewölkung-Umsatz)
+```{r}
+# Berechnung von Mittelwerten, Standardabweichungen, Standardfehlern und Konfidenzintervallen
+my_sum <- merge_um_wet %>%
+  group_by(Bewoelkung) %>%
+  summarise(
+    n=n(),
+    mean=mean(Umsatz),
+    sd=sd(Umsatz)
+  ) %>%
+  mutate( se=sd/sqrt(n))  %>%
+  mutate( ic=se * qt((1-0.05)/2 + .5, n-1))
+
+# Confidence Interval
+ggplot(my_sum) +
+  geom_bar( aes(x=Bewoelkung, y=mean), stat="identity", fill="forestgreen", alpha=0.9) +
+  geom_errorbar( aes(x=Bewoelkung, ymin=mean-ic, ymax=mean+ic), width=0.4, colour="orange", alpha=0.9, size=0.1) +
+#  scale_x_discrete(limits = c("Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"),
+#                   labels = c("Montag", "Tuchtag", "CheapCheap", "Donnerstag", "Freitag", "Samstag", "Sonntag")) +
+  ggtitle("using confidence interval")
+
+
+```
+
+

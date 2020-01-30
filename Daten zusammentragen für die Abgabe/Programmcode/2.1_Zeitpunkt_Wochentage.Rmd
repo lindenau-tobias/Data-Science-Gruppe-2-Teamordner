@@ -1,0 +1,161 @@
+---
+title: "Zeitpunkt_Wochentage"
+output: html_notebook
+Ziel: "Welchen Einfluss hat die Lage  in der Woche auf den Umsatz?"
+Autor: "Merle Oelbüttel"
+Datum des Erstellens: "28.11.2019"
+
+---
+
+```{r}
+#Laden der Bibliotheken
+
+library(readr)
+library(tidyverse)
+library(lubridate)
+library(ggplot2)
+library(dplyr)
+```
+
+
+Einlesen und Vorbereitung der Daten
+```{r}
+#Einlesen der Daten
+
+umsatz <- read_csv("umsatzdaten_gekuerzt.csv", 
+    col_types = cols(Datum = col_datetime(format = " %Y-%m-%d   "))) #Eingeben des Datums
+```
+
+
+
+```{r}
+
+#Wochentage allgemein
+
+
+#Erstellung der Variable mit Wochentag
+
+umsatz$wochentag <- weekdays(umsatz$Datum)
+
+#Tage ordnen
+umsatz$wochentag <- factor(umsatz$wochentag , levels= c("Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"))
+
+umsatz[order(umsatz$wochentag), ]
+#Balkendiagramm der Umsätze von Warengruppe 1 je Wochentag (ohne Konfidenzintervall)
+
+ggplot(umsatz) +
+  geom_bar(aes(x = wochentag, y = Umsatz), stat = "identity")
+
+
+#Balkendiagramm der Umsätze aller Warengruppen je Wochentag (ohne Konfidenzintervall)
+# Berechnung von Mittelwerten, Standardabweichungen, Standardfehlern und Konfidenzintervallen
+#n ist einfach nur praktisch und z?hlt die Wochentage
+my_sum_week<- umsatz %>%
+  group_by(wochentag) %>%
+  summarise(
+    n=n(), #ist praktisch, weil es die Anzahl z?hlt
+    mean=mean(Umsatz),
+    sd=sd(Umsatz),
+    summe=sum(Umsatz)) %>%
+  mutate( se=sd/sqrt(n))  %>%
+  mutate( ic=se * qt((1-0.05)/2 + .5, n-1))
+
+# Confidence Interval
+ggplot(my_sum_week) +
+  geom_bar( aes(x=wochentag, y=mean), stat="identity", fill="forestgreen", alpha=0.5) +
+  geom_errorbar( aes(x=wochentag, ymin=mean-ic, ymax=mean+ic), width=0.4, colour="orange", alpha=0.9, size=1.5) +
+  xlab("Wochentag")+
+  ylab("Durschnitt (€)")+
+  ggtitle("Durchschnittlicher Umsatz in der Woche über alle Warengruppen")
+
+```
+
+```{r}
+
+#Tabelle für den Umsatz nach Warengruppen  und  Wochentagen
+ware_week<- umsatz %>%
+  group_by(wochentag, Warengruppe) %>%
+  summarise(
+    n=n(), #ist praktisch, weil es die Anzahl z?hlt
+    mean=mean(Umsatz),
+    sd=sd(Umsatz),
+    summe=sum(Umsatz)
+  ) %>%
+  mutate( se=sd/sqrt(n))  %>%
+  mutate( ic=se * qt((1-0.05)/2 + .5, n-1))
+
+#Tage ordnen
+ware_week$wochentag <- factor(ware_week$wochentag , levels= c("Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"))
+
+ware_week[order(ware_week$wochentag), ]
+
+
+# nach Warengruppe an den Wochentagen den Umsatz plotten
+ggplot(ware_week) +
+  geom_bar( aes(x=Warengruppe, y=mean), stat="identity", fill="forestgreen", alpha=0.5) +
+  geom_errorbar( aes(x=Warengruppe, ymin=mean-ic, ymax=mean+ic), width=0.4, colour="orange", alpha=0.9, size=1.5) +
+  ylab("Durchschnitt (€)")+
+ facet_wrap(~wochentag)+
+  ggtitle("Umsatz nach Warengruppe und Wochentag")
+
+
+
+ggplot(ware_week) +
+  geom_bar( aes(x=wochentag, y=mean), stat="identity", fill="forestgreen", alpha=0.5) +
+  geom_errorbar( aes(x=Warengruppe, ymin=mean-ic, ymax=mean+ic), width=0.4, colour="orange", alpha=0.9, size=1.5) +
+  ylab("Durchschnitt (€)")+
+ facet_wrap(~Warengruppe)+
+  ggtitle("Umsatz nach Warengruppe und Wochentag")
+```
+
+
+
+für weitere Analyse müssen erst die ganzen Feiertage etc. rausgenommen werden
+
+```{r}
+
+#einlesen der Variable mit den Feiertagen
+
+#Feiertage <- read_delim("Variablen.csv",         #bisher nur für das Jahr 2013 (Stand 09.12)
+#    ";", escape_double = FALSE, trim_ws = TRUE)
+
+#Warengruppe 6 rausnehmen und alle Werte von Warengruppe 5 über 1000 Euro (Ergebnis einer anderen Analyse zeigte, dass Warengruppe 5 nur an ganz singulären Tagen so einen großen Umsatz macht, deswegen verfälscht es evtl. das Ergebnis)
+
+
+
+#Tabelle für den Umsatz nach Warengruppen  und  Wochentagen (ohne Warengruppe 6 und Werte von Warengruppe 5 über 1000€)
+ware_ohne6_5gr1000<- umsatz %>%
+  filter(Warengruppe != 6)  %>%
+  filter(!(Warengruppe == 5 & Umsatz >= 1000)) %>%   #alles rausgefiltert wo 5 mehr Umsatz als 1000 Euro hat
+  group_by(wochentag, Warengruppe) %>%
+  summarise(
+    n=n(), #ist praktisch, weil es die Anzahl z?hlt
+    mean=mean(Umsatz),
+    sd=sd(Umsatz),
+    summe=sum(Umsatz)
+  ) %>%
+  mutate( se=sd/sqrt(n))  %>%
+  mutate( ic=se * qt((1-0.05)/2 + .5, n-1))
+
+#Tage ordnen
+ware_ohne6_5gr1000$wochentag <- factor(ware_ohne6_5gr1000$wochentag , levels= c("Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"))
+
+ware_ohne6_5gr1000[order(ware_ohne6_5gr1000$wochentag), ]
+
+#labels=c("1 (Brot)", "2 (Brötchen)", "3 (Crossant)", "4( Konditorei)", "5 (Kuchen)")
+
+
+# nach Warengruppe an den Wochentagen den Umsatz plotten (ohne Warengruppe 6 und Warengruppe 5 über 1000 Euro)
+ggplot(ware_ohne6_5gr1000) +
+  geom_bar( aes(x=wochentag, y=mean), stat="identity", fill="forestgreen", alpha=0.5) +
+  geom_errorbar( aes(x=wochentag, ymin=mean-ic, ymax=mean+ic), width=0.4, colour="orange", alpha=0.9, size=1.5) +
+  ylab("Durchschnitt (€)")+
+  facet_wrap(~Warengruppe)+
+  ggtitle("Umsatz nach Warengruppe und Wochentag")+
+  labs(caption = "ohne Warengruppe 6 und Warengruppe 5 über 1000 Euro, sind auch aus den Standardabweichungen, Durchschnitten etc. entfernt")
+  
+
+```
+
+
+

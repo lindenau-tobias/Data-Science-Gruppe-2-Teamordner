@@ -1,0 +1,49 @@
+---
+title: "Zeitpunkt_Monat"
+output: html_notebook
+author: "Merle Oelbüttel"
+Datum des Erstellens: "03.12.2019"
+---
+
+
+```{r}
+#Laden der Bibliotheken
+
+library(readr)
+library(tidyverse)
+library(lubridate)
+library(ggplot2)
+library(dplyr)
+```
+
+
+```{r}
+#Einlesen der Daten
+
+umsatz <- read_csv("umsatzdaten_gekuerzt.csv", 
+    col_types = cols(Datum = col_datetime(format = " %Y-%m-%d   "))) #Eingeben des Datums
+
+#Erstellung der Variable mit Jahr
+umsatz$Monat <- month(umsatz$Datum)
+```
+
+Tabelle für den Umsatz der Warengruppen nach Monat
+```{r}
+#Tabelle für den Umsatz nach Warengruppen  und Jahren
+ware_monat<- umsatz %>%
+  group_by(Monat, Warengruppe) %>%
+  summarise(
+    n=n(), #ist praktisch, weil es die Anzahl z?hlt
+    mean=mean(Umsatz),
+    sd=sd(Umsatz),
+    summe=sum(Umsatz)) %>%
+  mutate( se=sd/sqrt(n))  %>%
+  mutate( ic=se * qt((1-0.05)/2 + .5, n-1))
+
+
+
+```
+
+
+
+

@@ -1,0 +1,280 @@
+---
+title: "Zeitpunkt_Monat"
+output: html_notebook
+Ziel: "Welchen Einfluss hat das Jahr und die Lage im Monat auf den Umsatz?"
+Autor: "Merle Oelbüttel"
+Datum des Erstellens: "01.12.2019"
+---
+
+
+
+```{r}
+# Einbinden benötigter Bibliotheken
+library(readr)
+library(lubridate)
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(hrbrthemes)
+library(reshape2)
+library(tidyr)
+
+# Einlesen der Umsatzdaten
+setwd("C:/Users/Tobias/Documents/Data Science Gruppe 2 Teamordner")
+umsatz <- read_csv("umsatzdaten_gekuerzt.csv", 
+    col_types = cols(Datum = col_datetime(format = " %Y-%m-%d   "))) #Eingeben des Datums
+
+# Einlesen der Wetter (Temperatur)
+setwd("C:/Users/Tobias/Documents/Data Science Gruppe 2 Teamordner")
+wetter <- read_csv("wetter.csv",
+    col_types = cols(Datum = col_datetime(format = " %Y-%m-%d   "))) #Eingeben des Datums
+sd_temp <- sd(wetter$Temperatur)
+```
+
+Wetter daten an umsatz datensatz anhängen (nach Datum gemerged)
+```{r}
+#Tabelle Umsatz und Wetter zusammenführen
+merge_um_wet_zeit <- merge(umsatz,wetter,by="Datum")
+
+# Als .csv im workspace abspeichern
+write.csv(merge_um_wet_zeit, file = "merge_um_wet_zeit.csv")
+```
+
+Umsatz und Temperatur in einem plot für den gesamten Zeitraum anzeigen lassen
+```{r}
+
+p1 <- ggplot(data = merge_um_wet_zeit, aes(x = Datum, y = Umsatz)) + #start plot by by plotting bars
+  geom_bar(stat = "identity") + 
+  #plot line on same graph
+  # rate multiplied by 100 to get on same scale as bars
+  geom_line(color="red", data = merge_um_wet_zeit, aes(x = Datum, y = (Temperatur)*100, group = 1), 
+            inherit.aes = FALSE) +
+  #specify secondary axis
+  #apply inverse of above transformation to correctly scale secondary axis (/10000000)
+  scale_y_continuous(sec.axis = sec_axis(~./100, name = "Temp"))
+plot(p1)
+
+#Plot im Gruppenordner abspeichern
+png('Umsatz_Wetter_gesamter_Zeitraum.png')
+plot(p1)
+dev.off()
+```
+
+
+Wie war der Umsatz in den Unterschiedlichen Jahren?
+```{r}
+#Erstellung der Variable mit Jahr
+merge_um_wet_zeit$jahr <- year(merge_um_wet_zeit$Datum)
+
+#Tabelle für den Umsatz nach Warengruppen  und Jahren
+ware_jahr<- merge_um_wet_zeit %>%
+  group_by(jahr, Warengruppe, Temperatur) %>%
+  summarise(
+    n=n(), #ist praktisch, weil es die Anzahl z?hlt
+    mean_um=mean(Umsatz),
+    sd_um=sd(Umsatz),
+    summe_um=sum(Umsatz)) %>%
+  mutate( se=sd_um/sqrt(n))  %>%
+  mutate( ic=se * qt((1-0.05)/2 + .5, n-1))
+
+#VERSUCH
+
+
+# nach Warengruppe nach Jahren den Umsatz plotten
+ggplot(ware_jahr) +
+  geom_bar( aes(x=Warengruppe, y=mean_um), stat="identity", fill="forestgreen", alpha=0.5) +
+  geom_line( aes(x=Warengruppe, y=Temperatur), stat="identity", fill="forestgreen", alpha=0.5) +
+#  geom_errorbar( aes(x=Warengruppe, ymin=mean_um-ic, ymax=mean_um+ic), width=0.4, colour="orange", alpha=0.9, size=1.5) +
+  ylab("Durchschnitt (€)")+
+ facet_wrap(~jahr)+
+  ggtitle("Umsatz nach Warengruppe und Jahr")
+
+# Als .csv im workspace abspeichern
+write.csv(merge_um_wet_zeit, file = "merge_um_wet_zeit_jahr.csv")
+```
+über den Gesamten Zeitraum den allgemeinen Umsatz plotten
+```{r}
+
+#Summe der Jahre bilden 
+sum_tag<- umsatz %>%
+  group_by(Datum) %>%
+  summarise(
+    n=n(), #ist praktisch, weil es die Anzahl z?hlt
+    mean=mean(Umsatz),
+    sd=sd(Umsatz),
+    summe=sum(Umsatz)) %>%
+  mutate( se=sd/sqrt(n))  %>%
+  mutate( ic=se * qt((1-0.05)/2 + .5, n-1))
+#nach Warengruppe an den Monatstagen den Umsatz plotten
+
+ggplot(sum_tag, aes(x=Datum, y=summe)) +
+  geom_point() +
+  geom_smooth(method=lm , color="red", se=FALSE) +
+    geom_label( 
+    data=sum_tag %>% filter(summe>=2000), # alles mit einer Summe ab 2000€ gelabelt
+    aes(label=Datum)
+  )+
+  xlab("Jahr")+
+  ylab("Summe Umsatz (€)")
+  ggtitle("Umsatz über den gesamten Zeitraum")
+```
+über den Gesamten Zeitraum die Unterschiede in den einzelnen Warengruppen plotten
+```{r}
+
+#nach Warengruppe an den Monatstagen den Umsatz plotten
+
+ggplot(umsatz, aes(x=Datum, y=Umsatz)) +
+  geom_point() +
+  facet_wrap(~Warengruppe)+
+  xlab("Jahr")+
+  ylab("Summe Umsatz (€)")+
+  ggtitle ("Umsatz über den gesamten Zeitraum nach Warengruppen")
+
+#testzeile
+    
+```
+
+über den Gesamten Zeitraum die Unterschiede in den einzelnen Warengruppen plotten (Umsatz und Temperatur gemeinsam)
+```{r}
+#nach Warengruppe an den Monatstagen den Umsatz und die Temperatur plotten
+
+ggplot(merge_um_wet_zeit, aes(x=Datum, y=Umsatz)) +
+  geom_point() +
+  facet_wrap(~Warengruppe)+
+  geom_line(color="red", data = merge_um_wet_zeit, aes(x = Datum, y = (Temperatur)*100, group = 1), 
+            inherit.aes = FALSE) +
+  xlab("Jahr")+
+  ylab("Summe Umsatz (€)")+
+  scale_y_continuous(sec.axis = sec_axis(~./100, name = "Temp"))+
+  ggtitle ("Umsatz und Temperatur über den gesamten Zeitraum nach Warengruppen")
+
+```
+
+```{r}
+#Balkendiagramm der Summe Umsätze je Jahr(ohne Konfidenzintervall)
+ggplot(ware_jahr) +
+  geom_bar( aes(x=Warengruppe, y=summe), stat="identity") +
+   ylab("Summe(€)")+
+ facet_wrap(~jahr)+
+  ggtitle("Summe der  Warengruppe in den Jahren")
+
+```
+
+gucken, wie die Unterschiedlichen Warengruppen in den Jahren liefen
+```{r}
+ggplot(ware_jahr, aes(x=jahr, y=mean)) +
+  geom_point() +
+  geom_smooth(method=lm , color="red", fill="#69b3a2", se=TRUE)+
+  xlab ("Jahr")+
+  ylab("Durchschnitt (€)")+
+  facet_wrap(~Warengruppe)+
+  ggtitle("Umsatz nach Warengruppe und Jahr")
+
+
+```
+
+Daten nach Tage eines Monats definieren
+```{r}
+merge_um_wet_zeit$monatstag<- mday(merge_um_wet_zeit$Datum)
+```
+
+Gucken, ob der Umsatz an den Monatstagen deutlich varriert
+```{r}
+sum_monatstage<- merge_um_wet_zeit %>%
+  group_by(monatstag) %>%
+  summarise(
+    n=n(), #ist praktisch, weil es die Anzahl z?hlt
+    mean=mean(Umsatz),
+    sd=sd(Umsatz),
+    summe=sum(Umsatz)) %>%
+  mutate( se=sd/sqrt(n))  %>%
+  mutate( ic=se * qt((1-0.05)/2 + .5, n-1))
+
+
+```
+
+
+nach den Tagen den allgemeinen Umsatz plotten
+```{r}
+# nach Warengruppe an den Monatstagen den Umsatz plotten
+
+ggplot(sum_monatstage, aes(x=monatstag, y=mean)) +
+  geom_point() +
+  geom_smooth(method=lm , color="red", fill="#69b3a2", se=TRUE)+
+  xlab ("Tage im Monat")+
+  ylab("Durchschnitt (€)")+
+  ggtitle("Umsatz im Monatsverlauf")
+
+
+```
+
+
+Den Umsatz für Waren der Monatstage rausfinden
+```{r}
+ware_monatstage<- merge_um_wet_zeit %>%
+  group_by(monatstag, Warengruppe) %>%
+  summarise(
+    n=n(), #ist praktisch, weil es die Anzahl z?hlt
+    mean=mean(Umsatz),
+    sd=sd(Umsatz),
+    summe=sum(Umsatz)) %>%
+  mutate( se=sd/sqrt(n))  %>%
+  mutate( ic=se * qt((1-0.05)/2 + .5, n-1))
+
+        
+```
+
+
+
+
+```{r}
+# nach Warengruppe an den Monatstagen den Umsatz plotten (Scatterplot)
+
+ggplot(ware_monatstage, aes(x=monatstag, y=mean)) +
+  geom_point() +
+  geom_smooth(method=lm , color="red", fill="#69b3a2", se=TRUE)+
+  facet_wrap(~Warengruppe)+
+  ggtitle("Umsatz nach Warengruppe und Monatstag")
+
+
+```
+
+```{r}
+#Monat an den Datensatz heranhängen
+merge_um_wet_zeit$monat<- month(merge_um_wet_zeit$Datum) 
+
+#den Umsatz nach den Monaten filtern
+ware_monat<- merge_um_wet_zeit %>%
+  group_by(monat, Warengruppe) %>%
+  summarise(
+    n=n(), #ist praktisch, weil es die Anzahl z?hlt
+    mean=mean(Umsatz),
+    sd=sd(Umsatz),
+    summe=sum(Umsatz)) %>%
+  mutate( se=sd/sqrt(n))  %>%
+  mutate( ic=se * qt((1-0.05)/2 + .5, n-1))
+
+# nach Warengruppe in den unterschiedlichen Monaten den Umsatz plotten (Scatterplot)
+ggplot(ware_monat, aes(x=monat, y=mean)) +
+  geom_point() +
+  geom_smooth(method=lm , color="red", fill="#69b3a2", se=TRUE)+
+  facet_wrap(~Warengruppe)+
+  xlab("Monat")+
+  ylab("Durchschnittlicher Umsatz (€)")
+  ggtitle("Umsatz nach Warengruppe und Monat")
+```
+
+```{r}
+#Erstellung der Variable mit Wochentag
+
+merge_um_wet_zeit$wochentag <- weekdays(merge_um_wet_zeit$Datum)
+```
+
+
+```{r}
+mod <- lm(Umsatz ~ as.factor(wochentag) + as.factor(Warengruppe) + as.factor(Wettercode) + Temperatur + monat + monatstag, merge_um_wet_zeit)
+summary(mod)
+```
+
+
+
